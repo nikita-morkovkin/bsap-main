@@ -60,6 +60,7 @@ export type VideoJob = {
 
 export type VideoStatus = {
   audio: { duration: number } | null
+  style?: VideoStyleConfig
   job?: VideoJob
   cycle?: { path: string; duration: number; loop: boolean; fps: number }
   output?: string

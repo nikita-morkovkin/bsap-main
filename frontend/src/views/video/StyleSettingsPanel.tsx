@@ -115,12 +115,11 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
         ))}
       </div>
 
+      <p className="text-sm text-muted-foreground">{videoText.shuffleHint}</p>
+
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <label className="flex items-center gap-2">
-          <Checkbox
-            checked={style.antiBanding}
-            onCheckedChange={antiBanding}
-          />{' '}
+          <Checkbox checked={style.antiBanding} onCheckedChange={antiBanding} />{' '}
           Anti-banding
         </label>
         <label className="flex items-center gap-2">
@@ -145,10 +144,7 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
           </Select>
         </label>
         <label className="flex items-center gap-2">
-          <Checkbox
-            checked={style.mirrorOnRepeat}
-            onCheckedChange={mirror}
-          />{' '}
+          <Checkbox checked={style.mirrorOnRepeat} onCheckedChange={mirror} />{' '}
           {videoText.mirror}
         </label>
         <label className="flex items-center gap-2">

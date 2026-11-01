@@ -2,6 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { getQueueToken } from '@nestjs/bullmq';
 import { Test } from '@nestjs/testing';
+import crypto from 'crypto';
 import { promises as fs } from 'fs';
 import type { Server } from 'http';
 import { tmpdir } from 'os';
@@ -18,6 +19,7 @@ import { VideoLibraryService } from '../video-library.service';
 import { VideoPreviewService } from '../video-preview.service';
 import { VideoUploadInterceptor } from '../video-upload.interceptor';
 import { videoStyleSchema } from '../schemas';
+import { VideoPlannerService } from '../video-planner.service';
 
 describe('Video project API and durable jobs', () => {
   let app: INestApplication<Server>;
@@ -83,6 +85,7 @@ describe('Video project API and durable jobs', () => {
   });
 
   afterEach(async () => {
+    jest.restoreAllMocks();
     await app.close();
     await fs.rm(directory, { recursive: true, force: true });
   });
@@ -140,6 +143,56 @@ describe('Video project API and durable jobs', () => {
     expect((await jobs.get(id, job.jobId)).stage).toBe('cancelled');
 
     jobs.detach(job.jobId);
+  });
+
+  it('persists a fresh shuffle seed for each build and leaves previews and muxes alone', async () => {
+    const random = jest
+      .spyOn(crypto, 'randomInt')
+      .mockReturnValueOnce(42)
+      .mockReturnValueOnce(43);
+    const style = videoStyleSchema.parse({ seed: 1, brightness: -0.3 });
+    const clips = Array.from({ length: 12 }, (_, index) => ({
+      id: String(index),
+      path: `/clips/${index}.mp4`,
+      duration: 14,
+    }));
+    const planner = new VideoPlannerService();
+
+    await state.updateState(id, (current) => {
+      current.video = { style };
+    });
+
+    const first = await jobs.start(id, 'build');
+    const firstStyle = (await state.getState(id)).video!.style;
+    expect(firstStyle).toEqual({ ...style, seed: 43 });
+    expect(queue.add).toHaveBeenLastCalledWith(
+      'build',
+      expect.objectContaining({ jobId: first.jobId, style: firstStyle }),
+      expect.anything(),
+    );
+
+    await jobs.update(id, first.jobId, { stage: 'done' });
+    const second = await jobs.start(id, 'build', style);
+    const secondStyle = (await state.getState(id)).video!.style;
+    expect(secondStyle).toEqual({ ...style, seed: 44 });
+    expect(queue.add).toHaveBeenLastCalledWith(
+      'build',
+      expect.objectContaining({ jobId: second.jobId, style: secondStyle }),
+      expect.anything(),
+    );
+    expect(
+      planner.plan(clips, firstStyle).items.map((item) => item.clipId),
+    ).not.toEqual(
+      planner.plan(clips, secondStyle).items.map((item) => item.clipId),
+    );
+
+    await jobs.update(id, second.jobId, { stage: 'done' });
+    const preview = await jobs.start(id, 'preview', secondStyle);
+    expect((await state.getState(id)).video!.style).toEqual(secondStyle);
+    await jobs.update(id, preview.jobId, { stage: 'done' });
+    await jobs.start(id, 'mux');
+    expect((await state.getState(id)).video!.style).toEqual(secondStyle);
+    expect(random).toHaveBeenCalledTimes(2);
   });
 
   it('marks interrupted work failed after restart and scopes job access to a project', async () => {

@@ -6,7 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { randomUUID } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 import { StateManagerService } from '../state/state-manager.service';
 import { videoStyleSchema } from './schemas';
 import type { VideoJobState } from './types/video-job.type';
@@ -79,6 +79,19 @@ export class VideoJobService implements OnModuleInit {
       }
 
       selected = style ?? current.video?.style ?? selected;
+
+      if (kind === 'build') {
+        // Exclude the last saved seed so consecutive builds always use a new one.
+        // Persist it before enqueueing so the worker and cache use the same plan.
+        const previousSeed = current.video?.style?.seed ?? selected.seed;
+        const value = randomInt(0, 0xffffffff);
+
+        selected = {
+          ...selected,
+          seed: value >= previousSeed ? value + 1 : value,
+        };
+      }
+
       current.video = { ...current.video, style: selected, job };
     });
 

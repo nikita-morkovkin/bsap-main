@@ -12,6 +12,7 @@ type VideoStepPageProps = { projectId: string }
 const VideoStepPage = ({ projectId }: VideoStepPageProps) => {
   const settings = useVideoSettings({ projectId })
   const { status, refresh } = useVideoJob({ projectId })
+  const style = status?.style ?? settings.style
 
   const busy = Boolean(
     status?.job && !['done', 'failed', 'cancelled'].includes(status.job.stage),
@@ -34,12 +35,12 @@ const VideoStepPage = ({ projectId }: VideoStepPageProps) => {
           {settings.error}
         </p>
       )}
-      {settings.style ? (
+      {style ? (
         <>
-          <FramePreview projectId={projectId} style={settings.style} />
+          <FramePreview projectId={projectId} style={style} />
           <BuildPanel
             projectId={projectId}
-            style={settings.style}
+            style={style}
             status={status}
             refresh={refresh}
             busy={busy}

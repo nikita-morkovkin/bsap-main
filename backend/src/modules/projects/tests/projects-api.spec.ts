@@ -283,8 +283,18 @@ describe('Projects REST API', () => {
 
       expect(queue.add).toHaveBeenCalledWith(
         'build',
-        expect.objectContaining({ projectId: id, style }),
+        expect.objectContaining({
+          projectId: id,
+          style: (await manager.getState(id)).video?.style,
+        }),
         expect.anything(),
+      );
+      expect((await manager.getState(id)).video?.style).toEqual({
+        ...style,
+        seed: expect.any(Number),
+      });
+      expect((await manager.getState(id)).video?.style.seed).not.toBe(
+        style.seed,
       );
     }
 
@@ -293,7 +303,10 @@ describe('Projects REST API', () => {
       'build',
       expect.objectContaining({
         projectId: state.projectId,
-        style: videoStyleSchema.parse({}),
+        style: expect.objectContaining({
+          ...videoStyleSchema.parse({}),
+          seed: expect.any(Number),
+        }),
       }),
       expect.anything(),
     );
@@ -308,7 +321,10 @@ describe('Projects REST API', () => {
       'build',
       expect.objectContaining({
         projectId: legacy.projectId,
-        style: legacyStyle,
+        style: expect.objectContaining({
+          ...legacyStyle,
+          seed: expect.any(Number),
+        }),
       }),
       expect.anything(),
     );

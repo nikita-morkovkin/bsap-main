@@ -25,6 +25,8 @@ export const videoText = {
   slowMoMax: 'Maximum slow motion',
   cycleTargetMinutes: 'Cycle target (minutes)',
   seed: 'Shuffle seed',
+  shuffleHint:
+    'The seed controls previews. Each video build automatically selects a new seed and shuffles the clips.',
   width: 'Width',
   height: 'Height',
   fps: 'Frames per second',
