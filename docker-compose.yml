@@ -1,0 +1,113 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - bsap-network
+
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    ports:
+      - "${KOKORO_TTS_PORT}:8880"
+    networks:
+      - bsap-network
+
+  # GPU Kokoro is optional: start with `docker compose --profile gpu up -d kokoro-tts-gpu`.
+  # Requires an NVIDIA GPU and the NVIDIA Container Toolkit on the host.
+  kokoro-tts-gpu:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - bsap-network
+
+  polza-api:
+    build:
+      context: ./polza-api
+    ports:
+      - "${POLZA_API_PORT}:4000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4000
+    volumes:
+      - ./polza-api/config.json:/app/config.json:ro
+    networks:
+      - bsap-network
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${BACKEND_PORT}:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      kokoro-tts:
+        condition: service_started
+      polza-api:
+        condition: service_started
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment:
+      NODE_ENV: "${NODE_ENV}"
+      PORT: "${BACKEND_PORT}"
+      REDIS_HOST: "${REDIS_HOST}"
+      REDIS_PORT: "${REDIS_PORT}"
+      POLZA_API_URL: "${POLZA_API_URL}"
+      POLZA_API_KEY: "${POLZA_API_KEY}"
+      KOKORO_TTS_URL: "${KOKORO_TTS_URL}"
+      KOKORO_TIMEOUT_MS: "${KOKORO_TIMEOUT_MS}"
+      KOKORO_GPU_TTS_URL: "${KOKORO_GPU_TTS_URL:-http://kokoro-tts-gpu:8880}"
+      LUMEAN_API_URL: "${LUMEAN_API_URL:-https://api.lumean.app/api/public}"
+      LUMEAN_TIMEOUT_MS: "${LUMEAN_TIMEOUT_MS:-600000}"
+      FFPROBE_PATH: "${FFPROBE_PATH}"
+      FFMPEG_PATH: "${FFMPEG_PATH:-ffmpeg}"
+      VIDEO_MAX_UPLOAD_BYTES: "${VIDEO_MAX_UPLOAD_BYTES:-1073741824}"
+      VIDEO_CHUNK_SIZE: "${VIDEO_CHUNK_SIZE:-10}"
+      VIDEO_FFMPEG_TIMEOUT_MS: "${VIDEO_FFMPEG_TIMEOUT_MS:-7200000}"
+      VIDEO_DEBUG: "${VIDEO_DEBUG:-0}"
+      MUSIC_MAX_UPLOAD_BYTES: "${MUSIC_MAX_UPLOAD_BYTES:-536870912}"
+      MUSIC_MAX_DURATION_SECONDS: "${MUSIC_MAX_DURATION_SECONDS:-14400}"
+      DEFAULT_ARCHITECT_MODEL: "${DEFAULT_ARCHITECT_MODEL}"
+      DEFAULT_WRITER_MODEL: "${DEFAULT_WRITER_MODEL}"
+    volumes:
+      - ./projects:/app/projects
+      - ./assets:/app/assets
+      - ./prompts:/app/prompts
+    networks:
+      - bsap-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    environment:
+      API_PROXY_TARGET: http://backend:3000
+    depends_on:
+      - backend
+    networks:
+      - bsap-network
+
+volumes:
+  redis-data:
+
+networks:
+  bsap-network:
+    driver: bridge
