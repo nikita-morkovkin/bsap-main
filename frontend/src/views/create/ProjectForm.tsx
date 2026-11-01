@@ -7,6 +7,9 @@ import { useModels, useVoices } from '@/hooks/queries/useSettings.hook'
 import { useProjectForm } from '@/hooks/useProjectForm.hook'
 import type { MusicTrack } from '@/types/music.types'
 import type { Profile } from '@/types/project.types'
+import type { VideoStyleConfig } from '@/types/video.types'
+import StyleSettingsPanel from '@/views/video/StyleSettingsPanel'
+import CreationFramePreview from './CreationFramePreview'
 import { getModelEffort } from '@/utils/settings.util'
 import { Sparkles } from 'lucide-react'
 import type { SubmitEvent } from 'react'
@@ -15,10 +18,14 @@ import PromptStudio from './PromptStudio'
 import StockPicker from './StockPicker'
 import ReasoningSelect from './ReasoningSelect'
 
-type ProjectFormProps = { defaults: Profile; tracks: MusicTrack[] }
+type ProjectFormProps = {
+  defaults: Profile
+  tracks: MusicTrack[]
+  videoDefaults: VideoStyleConfig
+}
 
-const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
-  const form = useProjectForm({ defaults, tracks })
+const ProjectForm = ({ defaults, tracks, videoDefaults }: ProjectFormProps) => {
+  const form = useProjectForm({ defaults, tracks, videoDefaults })
   const { profile } = form
   const models = useModels()
   const voices = useVoices()
@@ -218,6 +225,20 @@ const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
           onChange={form.setSelectedTrackIds}
         />
         <StockPicker files={form.stockFiles} onChange={form.setStockFiles} />
+        <StyleSettingsPanel
+          style={form.videoStyle}
+          onChange={form.setVideoStyle}
+        />
+        {form.videoStyleError && (
+          <p role="alert" className="text-destructive">
+            {form.videoStyleError}
+          </p>
+        )}
+        <CreationFramePreview
+          files={form.stockFiles}
+          style={form.videoStyle}
+          valid={!form.videoStyleError}
+        />
         <Button
           type="submit"
           size="lg"

@@ -1,4 +1,6 @@
 import type { ChangeEvent } from 'react'
+import { Input } from '@/components/ui/Input'
+import { Slider } from '@/components/ui/Slider'
 import type { VideoStyleConfig } from '@/types/video.types'
 import { videoText } from './consts/video-text.const'
 import { videoControls } from './consts/video-controls.const'
@@ -23,17 +25,21 @@ const StyleNumber = ({ control, style, onChange }: StyleNumberProps) => {
   return (
     <label className="space-y-1 text-sm">
       <span className="block">{label}</span>
-      <input
-        type="range"
+      <Slider
         aria-label={label}
+        value={[value]}
         min={control.min}
         max={control.max}
         step={control.step}
-        value={value}
-        onChange={handleChange}
-        className="w-full"
+        onValueChange={(values) => {
+          const next = Array.isArray(values) ? values[0] : values
+
+          if (next !== undefined) {
+            onChange({ ...style, [control.key]: next })
+          }
+        }}
       />
-      <input
+      <Input
         type="number"
         aria-label={label}
         min={control.min}
@@ -41,7 +47,7 @@ const StyleNumber = ({ control, style, onChange }: StyleNumberProps) => {
         step={control.step}
         value={value}
         onChange={handleChange}
-        className="w-full rounded border p-1"
+        className="h-8 rounded-md px-2 py-1"
       />
     </label>
   )

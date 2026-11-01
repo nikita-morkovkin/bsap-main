@@ -7,6 +7,39 @@ import type {
 import { axiosInstance } from './axiosInstance'
 
 export const videoApi = {
+  sourceFrame: async (file: File, signal: AbortSignal): Promise<Blob> => {
+    const body = new FormData()
+    body.append('file', file)
+    const { data } = await axiosInstance.post<Blob>(
+      '/video-style-preview/frame',
+      body,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        responseType: 'blob',
+        signal,
+      },
+    )
+    return data
+  },
+  stylePreview: async (
+    frame: Blob,
+    style: VideoStyleConfig,
+    signal: AbortSignal,
+  ): Promise<Blob> => {
+    const body = new FormData()
+    body.append('frame', frame, 'frame.jpg')
+    body.append('style', JSON.stringify(style))
+    const { data } = await axiosInstance.post<Blob>(
+      '/video-style-preview',
+      body,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        responseType: 'blob',
+        signal,
+      },
+    )
+    return data
+  },
   root: (id: string) => `/projects/${encodeURIComponent(id)}/video`,
   url: (id: string, suffix: string) =>
     `${axiosInstance.defaults.baseURL}${videoApi.root(id)}/${suffix}`,

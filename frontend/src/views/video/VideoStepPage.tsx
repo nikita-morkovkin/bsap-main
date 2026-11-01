@@ -6,7 +6,6 @@ import FramePreview from './FramePreview'
 import { useVideoJob } from './hooks/useVideoJob.hook'
 import { useVideoSettings } from './hooks/useVideoSettings.hook'
 import StockLibrary from './StockLibrary'
-import StyleSettingsPanel from './StyleSettingsPanel'
 
 type VideoStepPageProps = { projectId: string }
 
@@ -37,10 +36,6 @@ const VideoStepPage = ({ projectId }: VideoStepPageProps) => {
       )}
       {settings.style ? (
         <>
-          <StyleSettingsPanel
-            style={settings.style}
-            onChange={settings.change}
-          />
           <FramePreview projectId={projectId} style={settings.style} />
           <BuildPanel
             projectId={projectId}

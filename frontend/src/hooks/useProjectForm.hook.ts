@@ -1,12 +1,20 @@
 import type { ProfileInputEvent } from '@/types/form.types'
 import type { MusicTrack } from '@/types/music.types'
 import type { Profile, ReasoningEffort } from '@/types/project.types'
+import type { VideoStyleConfig } from '@/types/video.types'
 import { useState, type ChangeEvent, type SyntheticEvent } from 'react'
 import { useCreateProjectMutation } from './mutations/useCreateProjectMutation.hook'
 
-type HookProps = { defaults: Profile; tracks: MusicTrack[] }
+type HookProps = {
+  defaults: Profile
+  tracks: MusicTrack[]
+  videoDefaults: VideoStyleConfig
+}
 type ReturnProps = {
   stockFiles: File[]
+  videoStyle: VideoStyleConfig
+  setVideoStyle: (style: VideoStyleConfig) => void
+  videoStyleError?: string
   setStockFiles: (files: File[]) => void
   selectedTrackIds: string[]
   setSelectedTrackIds: (ids: string[]) => void
@@ -31,6 +39,7 @@ type ReturnProps = {
 export const useProjectForm = ({
   defaults,
   tracks,
+  videoDefaults,
 }: HookProps): ReturnProps => {
   const [selectedTrackIds, setSelectedTrackIds] = useState(() =>
     tracks.filter((track) => track.available).map((track) => track.id),
@@ -40,12 +49,23 @@ export const useProjectForm = ({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [profile, setProfile] = useState(defaults)
+  const [videoStyle, setVideoStyle] = useState(videoDefaults)
   const mutation = useCreateProjectMutation()
 
   const trimmedTitle = title.trim()
   const trimmedDescription = description.trim()
+  const videoStyleError =
+    videoStyle.slowMoMax < videoStyle.slowMoDefault
+      ? 'Maximum slow motion must be at least the slow motion factor.'
+      : videoStyle.maxClipDurationSec !== 0 &&
+          videoStyle.maxClipDurationSec < videoStyle.minClipDurationSec
+        ? 'Maximum clip length must be zero or at least the minimum.'
+        : videoStyle.minClipDurationSec <= videoStyle.crossfadeSec * 2
+          ? 'Minimum clip length must exceed two crossfades.'
+          : undefined
 
   const canSubmit = Boolean(
+    !videoStyleError &&
     trimmedTitle &&
     trimmedDescription &&
     trimmedTitle.length <= 100 &&
@@ -102,11 +122,15 @@ export const useProjectForm = ({
       profile: { ...profile, ...overrides },
       selectedTrackIds,
       stockFiles,
+      videoStyle,
     })
   }
 
   return {
     stockFiles,
+    videoStyle,
+    setVideoStyle,
+    videoStyleError,
     setStockFiles,
     selectedTrackIds,
     setSelectedTrackIds,

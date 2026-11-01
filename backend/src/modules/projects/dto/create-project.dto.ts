@@ -1,5 +1,6 @@
 import { Profile } from '../../state/types';
 import { createProjectSchema } from '../schemas/create-project.schema';
+import type { VideoStyleConfig } from '../../video/types/video-style.type';
 
 export class CreateProjectDto {
   public static readonly schema = createProjectSchema;
@@ -9,4 +10,5 @@ export class CreateProjectDto {
   public profile!: Profile;
   public selectedTrackIds?: string[];
   public autoMontage?: boolean;
+  public videoStyle?: VideoStyleConfig;
 }

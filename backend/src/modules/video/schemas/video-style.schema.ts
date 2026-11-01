@@ -11,7 +11,7 @@ export const videoStyleSchema = z
     slowMoMax: z.number().min(1).max(2).default(2),
     crossfadeSec: z.number().min(1).max(6).default(3),
     transition: z.enum(['fade', 'smoothleft', 'dissolve']).default('fade'),
-    brightness: z.number().min(-1).max(1).default(-0.22),
+    brightness: z.number().min(-1).max(1).default(-0.05),
     contrast: z.number().min(0.5).max(1.5).default(0.88),
     saturation: z.number().min(0).max(1.5).default(0.75),
     gamma: z.number().min(0.5).max(1.5).default(0.85),

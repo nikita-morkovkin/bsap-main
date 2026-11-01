@@ -27,6 +27,9 @@ import { MusicService } from '../../music/music.service';
 import { MusicProbeService } from '../../music/music-probe.service';
 import { getQueueToken } from '@nestjs/bullmq';
 import { PIPELINE_JOBS } from '../../queue/consts';
+import { videoStyleSchema } from '../../video/schemas';
+import { VideoJobService } from '../../video/video-job.service';
+import { AutoMontageService } from '../../video/auto-montage.service';
 
 describe('Projects REST API', () => {
   let app: INestApplication<Server>;
@@ -225,6 +228,104 @@ describe('Projects REST API', () => {
 
     expect(created.title).toBe('Hidden Ocean');
     expect(created.topic).toBe('A gentle journey into ocean life.');
+  });
+
+  it('persists the selected style before queueing and passes it to manual and automatic video jobs', async () => {
+    const style = videoStyleSchema.parse({
+      brightness: -0.4,
+      width: 1280,
+      height: 720,
+      cycleTargetMinutes: 12,
+      seed: 987,
+      antiBanding: false,
+    });
+    const queue = { add: jest.fn().mockResolvedValue({}) };
+    const jobs = new VideoJobService(manager, queue as never);
+    const verifyStyleBeforeEnqueue = async (id: string) => {
+      expect((await manager.getState(id)).video?.style).toEqual(style);
+    };
+    scripts.enqueueProject
+      .mockImplementationOnce(verifyStyleBeforeEnqueue)
+      .mockImplementationOnce(verifyStyleBeforeEnqueue);
+
+    const defaults = await request(app.getHttpServer())
+      .get('/api/projects/video-style-defaults')
+      .expect(200);
+    expect(defaults.body).toEqual(videoStyleSchema.parse({}));
+
+    for (const autoMontage of [false, true]) {
+      const title = autoMontage ? 'Automatic Style' : 'Manual Style';
+      const response = await request(app.getHttpServer())
+        .post('/api/projects')
+        .send({
+          title,
+          description: 'A quiet journey',
+          profile,
+          videoStyle: style,
+          autoMontage,
+        })
+        .expect(201);
+      const id = autoMontage ? '003-automatic-style' : '002-manual-style';
+      expect(response.body).toMatchObject({ projectId: id, video: { style } });
+      expect((await manager.getState(id)).video?.style).toEqual(style);
+
+      if (autoMontage) {
+        await manager.updateState(id, (current) => {
+          current.status = 'COMPLETED';
+          current.outputFiles.wav = 'output/master.wav';
+          current.video!.autoMontage!.status = 'pending';
+        });
+        const auto = new AutoMontageService(manager, jobs, {} as never);
+        await auto.tick();
+      } else {
+        await jobs.start(id, 'build');
+      }
+
+      expect(queue.add).toHaveBeenCalledWith(
+        'build',
+        expect.objectContaining({ projectId: id, style }),
+        expect.anything(),
+      );
+    }
+
+    await jobs.start(state.projectId, 'build');
+    expect(queue.add).toHaveBeenCalledWith(
+      'build',
+      expect.objectContaining({
+        projectId: state.projectId,
+        style: videoStyleSchema.parse({}),
+      }),
+      expect.anything(),
+    );
+
+    const legacyStyle = videoStyleSchema.parse({ brightness: -0.15, seed: 77 });
+    const legacy = await manager.initProject('Old saved style', profile);
+    await manager.updateState(legacy.projectId, (current) => {
+      current.video = { style: legacyStyle };
+    });
+    await jobs.start(legacy.projectId, 'build');
+    expect(queue.add).toHaveBeenCalledWith(
+      'build',
+      expect.objectContaining({
+        projectId: legacy.projectId,
+        style: legacyStyle,
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('rejects invalid creation styles without creating an episode', async () => {
+    await request(app.getHttpServer())
+      .post('/api/projects')
+      .send({
+        title: 'Invalid Style',
+        description: 'A quiet journey',
+        profile,
+        videoStyle: { brightness: 5 },
+      })
+      .expect(400);
+    expect(await manager.listProjects()).toHaveLength(1);
+    expect(scripts.enqueueProject).not.toHaveBeenCalled();
   });
 
   it('rejects missing, whitespace-only, and over-limit title or description values', async () => {

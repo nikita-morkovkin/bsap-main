@@ -1,15 +1,24 @@
+import { apiClient } from '@/api/apiClient'
 import QueryFeedback from '@/components/common/QueryFeedback'
-import { useProjectDefaults } from '@/hooks/queries/useProjectDefaults.hook'
-import ProjectForm from './ProjectForm'
 import { useMusic } from '@/hooks/queries/useMusic.hook'
+import { useProjectDefaults } from '@/hooks/queries/useProjectDefaults.hook'
+import { useQuery } from '@tanstack/react-query'
+import ProjectForm from './ProjectForm'
 
 const CreateProjectView = () => {
   const query = useProjectDefaults()
   const music = useMusic()
 
+  const videoDefaults = useQuery({
+    queryKey: ['video-style-defaults'],
+    queryFn: ({ signal }) => apiClient.projects.getVideoStyleDefaults(signal),
+    staleTime: Infinity,
+  })
+
   const handleRetry = () => {
     query.refetch()
     music.refetch()
+    videoDefaults.refetch()
   }
 
   return (
@@ -43,8 +52,22 @@ const CreateProjectView = () => {
           onRetry={handleRetry}
         />
       )}
-      {query.data && music.data && (
-        <ProjectForm defaults={query.data} tracks={music.data.tracks} />
+      {videoDefaults.isPending && (
+        <p role="status">Loading video style defaults…</p>
+      )}
+      {videoDefaults.isError && (
+        <QueryFeedback
+          error
+          message="Could not load video style defaults."
+          onRetry={handleRetry}
+        />
+      )}
+      {query.data && music.data && videoDefaults.data && (
+        <ProjectForm
+          defaults={query.data}
+          tracks={music.data.tracks}
+          videoDefaults={videoDefaults.data}
+        />
       )}
     </section>
   )

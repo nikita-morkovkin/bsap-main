@@ -13,6 +13,7 @@ import { stateSchema } from '../state/schemas';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { RegenerateChunkDto } from './dto/regenerate-chunk.dto';
 import { ProjectsService } from './projects.service';
+import { videoStyleSchema } from '../video/schemas';
 
 @Controller('api/projects')
 export class ProjectsController {
@@ -31,6 +32,11 @@ export class ProjectsController {
   @Post()
   public async createProject(@Body() payload: CreateProjectDto) {
     return this.projectsService.createProject(payload);
+  }
+
+  @Get('video-style-defaults')
+  public getVideoStyleDefaults() {
+    return videoStyleSchema.parse({});
   }
 
   @Get(':id')

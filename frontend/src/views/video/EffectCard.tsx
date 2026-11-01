@@ -1,5 +1,6 @@
 import { apiClient } from '@/api/apiClient'
 import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
 import type { VideoEffect } from '@/types/video-effect.type'
 import { useState, type ChangeEvent } from 'react'
 import { toast } from 'sonner'
@@ -13,6 +14,7 @@ type EffectCardProps = {
 
 const EffectCard = ({ projectId, effect, busy, refresh }: EffectCardProps) => {
   const [draft, setDraft] = useState(effect)
+
   const change = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target
 
@@ -21,6 +23,7 @@ const EffectCard = ({ projectId, effect, busy, refresh }: EffectCardProps) => {
       [name]: ['name', 'blend'].includes(name) ? value : Number(value),
     }))
   }
+
   const save = async () => {
     try {
       await apiClient.effects.edit(projectId, draft)
@@ -29,6 +32,7 @@ const EffectCard = ({ projectId, effect, busy, refresh }: EffectCardProps) => {
       toast.error('Could not save effect')
     }
   }
+
   const remove = async () => {
     try {
       await apiClient.effects.remove(projectId, effect.id)
@@ -37,6 +41,7 @@ const EffectCard = ({ projectId, effect, busy, refresh }: EffectCardProps) => {
       toast.error('Could not delete effect')
     }
   }
+
   const url = apiClient.video.url(projectId, `effects/${effect.id}/preview`)
 
   return (
@@ -55,7 +60,7 @@ const EffectCard = ({ projectId, effect, busy, refresh }: EffectCardProps) => {
       </p>
       <label className="block text-xs">
         Name
-        <input
+        <Input
           name="name"
           value={draft.name}
           onChange={change}

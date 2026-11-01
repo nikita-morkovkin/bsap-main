@@ -22,6 +22,8 @@ import { TextModule } from '../text/text.module';
 import { VideoInputsService } from './video-inputs.service';
 import { AutoMontageService } from './auto-montage.service';
 import { EffectGeneratorService } from './effect-generator.service';
+import { VideoStylePreviewController } from './video-style-preview.controller';
+import { VideoPreviewUploadInterceptor } from './video-preview-upload.interceptor';
 
 @Module({
   imports: [
@@ -31,7 +33,12 @@ import { EffectGeneratorService } from './effect-generator.service';
     TextModule,
     BullModule.registerQueue({ name: 'video' }),
   ],
-  controllers: [VideoController, ExportController, VideoEffectsController],
+  controllers: [
+    VideoController,
+    ExportController,
+    VideoEffectsController,
+    VideoStylePreviewController,
+  ],
   providers: [
     VideoLibraryService,
     VideoNormalizerService,
@@ -42,6 +49,7 @@ import { EffectGeneratorService } from './effect-generator.service';
     VideoJobService,
     VideoProcessor,
     VideoUploadInterceptor,
+    VideoPreviewUploadInterceptor,
     ExportService,
     VideoFullService,
     VideoEffectsService,

@@ -7,6 +7,7 @@ import type {
   RegenerateChunkPayload,
 } from '@/types/project.types'
 import { axiosInstance } from './axiosInstance'
+import type { VideoStyleConfig } from '@/types/video.types'
 
 const projectPath = (id: string) => `/projects/${encodeURIComponent(id)}`
 
@@ -25,6 +26,16 @@ export const getDefaults = async (signal?: AbortSignal): Promise<Profile> => {
     signal,
   })
 
+  return data
+}
+
+export const getVideoStyleDefaults = async (
+  signal?: AbortSignal,
+): Promise<VideoStyleConfig> => {
+  const { data } = await axiosInstance.get<VideoStyleConfig>(
+    '/projects/video-style-defaults',
+    { signal },
+  )
   return data
 }
 
@@ -81,6 +92,7 @@ export const deleteProject = async (id: string): Promise<void> => {
 export const projectsApi = {
   getProjects,
   getDefaults,
+  getVideoStyleDefaults,
   getProject,
   createProject,
   resumeProject,

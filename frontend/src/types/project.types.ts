@@ -1,4 +1,5 @@
 import type { ProjectMusic } from './music.types'
+import type { VideoStyleConfig } from './video.types'
 
 export type ReasoningEffort = string
 export type PipelineStatus =
@@ -96,6 +97,7 @@ export type CreateProjectPayload = {
   profile: Profile
   selectedTrackIds?: string[]
   autoMontage?: boolean
+  videoStyle?: VideoStyleConfig
 }
 export type RegenerateChunkPayload = Partial<
   Pick<Chunk, 'text' | 'ttsVoice' | 'ttsSpeed' | 'pauseAfterMs'>

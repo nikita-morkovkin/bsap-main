@@ -96,23 +96,27 @@ export class ProjectsService {
         state.projectId,
         payload.selectedTrackIds,
       );
+      if (payload.videoStyle || payload.autoMontage) {
+        initialized = await this.stateManagerService.updateState(
+          state.projectId,
+          (current) => {
+            current.video = {
+              ...current.video,
+              style:
+                payload.videoStyle ??
+                current.video?.style ??
+                videoStyleSchema.parse({}),
+              ...(payload.autoMontage
+                ? { autoMontage: { status: 'uploading' as const } }
+                : {}),
+            };
+          },
+        );
+      }
     } catch (error) {
       await this.stateManagerService.deleteProject(state.projectId);
 
       throw error;
-    }
-
-    if (payload.autoMontage) {
-      initialized = await this.stateManagerService.updateState(
-        state.projectId,
-        (current) => {
-          current.video = {
-            ...current.video,
-            style: current.video?.style ?? videoStyleSchema.parse({}),
-            autoMontage: { status: 'uploading' },
-          };
-        },
-      );
     }
 
     await this.scriptQueueService.enqueueProject(state.projectId);
