@@ -1,39 +1,39 @@
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import { useMusicMutation } from "@/hooks/mutations/useMusicMutation.hook";
-import { useRef, useState, type ChangeEvent, type SyntheticEvent } from "react";
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import { useMusicMutation } from '@/hooks/mutations/useMusicMutation.hook'
+import { useRef, useState, type ChangeEvent, type SyntheticEvent } from 'react'
 
 const MusicUploadForm = () => {
-  const mutation = useMusicMutation();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [name, setName] = useState("");
+  const mutation = useMusicMutation()
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState('')
 
   const handleName = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
+    setName(event.target.value)
+  }
 
   const handleUpload = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    const file = fileRef.current?.files?.[0];
+    const file = fileRef.current?.files?.[0]
 
     if (!file) {
-      return;
+      return
     }
 
     mutation.mutate(
-      { kind: "upload", file, displayName: name },
+      { kind: 'upload', file, displayName: name },
       {
         onSuccess: () => {
-          setName("");
+          setName('')
 
           if (fileRef.current) {
-            fileRef.current.value = "";
+            fileRef.current.value = ''
           }
         },
       },
-    );
-  };
+    )
+  }
 
   return (
     <form onSubmit={handleUpload} className="space-y-3 rounded-xl border p-4">
@@ -62,7 +62,7 @@ const MusicUploadForm = () => {
         </div>
 
         <Button
-          variant={"secondary"}
+          variant={'secondary'}
           type="submit"
           className="rounded-xl border p-2"
         >
@@ -80,7 +80,7 @@ const MusicUploadForm = () => {
       )}
       {mutation.isSuccess && <p role="status">Audio added to the library.</p>}
     </form>
-  );
-};
+  )
+}
 
-export default MusicUploadForm;
+export default MusicUploadForm

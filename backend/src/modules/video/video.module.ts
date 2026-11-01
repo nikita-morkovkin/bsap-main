@@ -31,11 +31,7 @@ import { EffectGeneratorService } from './effect-generator.service';
     TextModule,
     BullModule.registerQueue({ name: 'video' }),
   ],
-  controllers: [
-    VideoController,
-    ExportController,
-    VideoEffectsController,
-  ],
+  controllers: [VideoController, ExportController, VideoEffectsController],
   providers: [
     VideoLibraryService,
     VideoNormalizerService,

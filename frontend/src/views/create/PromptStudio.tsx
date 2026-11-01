@@ -1,12 +1,12 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { Textarea } from "@/components/ui/Textarea";
-import type { ProfileInputEvent } from "@/types/form.types";
-import type { Profile } from "@/types/project.types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Textarea } from '@/components/ui/Textarea'
+import type { ProfileInputEvent } from '@/types/form.types'
+import type { Profile } from '@/types/project.types'
 
 type PromptStudioProps = {
-  profile: Profile;
-  onChange: (event: ProfileInputEvent) => void;
-};
+  profile: Profile
+  onChange: (event: ProfileInputEvent) => void
+}
 
 const PromptStudio = ({ profile, onChange }: PromptStudioProps) => {
   return (
@@ -45,7 +45,7 @@ const PromptStudio = ({ profile, onChange }: PromptStudioProps) => {
         </TabsContent>
       </Tabs>
     </details>
-  );
-};
+  )
+}
 
-export default PromptStudio;
+export default PromptStudio

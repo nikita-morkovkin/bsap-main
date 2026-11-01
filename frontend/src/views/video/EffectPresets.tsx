@@ -1,41 +1,41 @@
-import { apiClient } from "@/api/apiClient";
-import Button from "@/components/ui/Button";
-import type { EffectPreset } from "@/types/effect-preset.type";
-import { useState, type ChangeEvent } from "react";
-import { toast } from "sonner";
+import { apiClient } from '@/api/apiClient'
+import Button from '@/components/ui/Button'
+import type { EffectPreset } from '@/types/effect-preset.type'
+import { useState, type ChangeEvent } from 'react'
+import { toast } from 'sonner'
 
-type EffectPresetsProps = { projectId: string; busy: boolean };
+type EffectPresetsProps = { projectId: string; busy: boolean }
 
 const EffectPresets = ({ projectId, busy }: EffectPresetsProps) => {
-  const [kind, setKind] = useState<EffectPreset>("marine_snow");
-  const [seed, setSeed] = useState(1);
+  const [kind, setKind] = useState<EffectPreset>('marine_snow')
+  const [seed, setSeed] = useState(1)
 
   const changeKind = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+    const value = event.target.value
 
     if (
-      value === "marine_snow" ||
-      value === "bubbles_rising" ||
-      value === "light_rays" ||
-      value === "dust_motes" ||
-      value === "plankton_sparkle"
+      value === 'marine_snow' ||
+      value === 'bubbles_rising' ||
+      value === 'light_rays' ||
+      value === 'dust_motes' ||
+      value === 'plankton_sparkle'
     ) {
-      setKind(value);
+      setKind(value)
     }
-  };
+  }
   const changeSeed = (event: ChangeEvent<HTMLInputElement>) => {
-    setSeed(Number(event.target.value));
-  };
+    setSeed(Number(event.target.value))
+  }
   const generate = async () => {
     try {
-      await apiClient.effects.preset(projectId, kind, seed);
+      await apiClient.effects.preset(projectId, kind, seed)
       toast.info(
-        "Preset generation queued. It will appear in the effect library.",
-      );
+        'Preset generation queued. It will appear in the effect library.',
+      )
     } catch {
-      toast.error("Could not start preset generation");
+      toast.error('Could not start preset generation')
     }
-  };
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -64,7 +64,7 @@ const EffectPresets = ({ projectId, busy }: EffectPresetsProps) => {
         Add preset
       </Button>
     </div>
-  );
-};
+  )
+}
 
-export default EffectPresets;
+export default EffectPresets

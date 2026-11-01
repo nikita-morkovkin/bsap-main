@@ -1,10 +1,10 @@
-import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
-import { cn } from 'cn';
+import { Progress as ProgressPrimitive } from '@base-ui/react/progress'
+import { cn } from 'cn'
 
-type ProgressProps = ProgressPrimitive.Root.Props;
+type ProgressProps = ProgressPrimitive.Root.Props
 
 const Progress = ({ className, children, ...props }: ProgressProps) => {
-  const classes = cn('w-full', className);
+  const classes = cn('w-full', className)
 
   return (
     <ProgressPrimitive.Root className={classes} {...props}>
@@ -13,8 +13,8 @@ const Progress = ({ className, children, ...props }: ProgressProps) => {
         <ProgressPrimitive.Indicator className="h-full bg-primary transition-all" />
       </ProgressPrimitive.Track>
     </ProgressPrimitive.Root>
-  );
-};
+  )
+}
 
-export { Progress };
-export default Progress;
+export { Progress }
+export default Progress

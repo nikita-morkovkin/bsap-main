@@ -1,23 +1,23 @@
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { filterCatalogOptions } from "@/utils/settings.util";
-import { useId, useState } from "react";
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { filterCatalogOptions } from '@/utils/settings.util'
+import { useId, useState } from 'react'
 import Select, {
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/Select";
+} from '../ui/Select'
 
 type CatalogSelectProps = {
-  label: string;
-  value: string;
-  options: { id: string; name: string }[];
-  onChange: (value: string) => void;
-  loading: boolean;
-  error: boolean;
-  onRetry: () => void;
-};
+  label: string
+  value: string
+  options: { id: string; name: string }[]
+  onChange: (value: string) => void
+  loading: boolean
+  error: boolean
+  onRetry: () => void
+}
 
 const CatalogSelect = ({
   label,
@@ -28,11 +28,11 @@ const CatalogSelect = ({
   error,
   onRetry,
 }: CatalogSelectProps) => {
-  const [search, setSearch] = useState("");
-  const id = useId();
-  const matches = filterCatalogOptions(options, search);
-  const available = options.some((option) => option.id === value);
-  const selected = options.find((option) => option.id === value);
+  const [search, setSearch] = useState('')
+  const id = useId()
+  const matches = filterCatalogOptions(options, search)
+  const available = options.some((option) => option.id === value)
+  const selected = options.find((option) => option.id === value)
 
   return (
     <div className="grid content-start gap-2 text-sm font-medium">
@@ -46,13 +46,15 @@ const CatalogSelect = ({
       <Select
         value={available ? value : null}
         onValueChange={(nextValue) => {
-          if (nextValue !== null) onChange(nextValue);
+          if (nextValue !== null) onChange(nextValue)
         }}
         required
         disabled={loading || error}
       >
         <SelectTrigger id={id} className="w-full min-w-0">
-          <SelectValue placeholder={loading ? "Loading…" : "Select an option"} />
+          <SelectValue
+            placeholder={loading ? 'Loading…' : 'Select an option'}
+          />
         </SelectTrigger>
         <SelectContent>
           {selected && !matches.includes(selected) && (
@@ -72,14 +74,14 @@ const CatalogSelect = ({
       )}
       {error && (
         <div role="alert">
-          Catalog unavailable.{" "}
+          Catalog unavailable.{' '}
           <Button type="button" variant="outline" onClick={onRetry}>
             Retry
           </Button>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CatalogSelect;
+export default CatalogSelect

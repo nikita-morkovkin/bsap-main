@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PIPELINE_JOBS } from '../queue/consts/pipeline-jobs.const';
 import { StateModule } from '../state/state.module';
+import { AppSettingsModule } from '../app-settings/app-settings.module';
 import { PolzaLlmService } from './polza-llm.service';
 import { PromptService } from './prompt.service';
 import { ScriptGeneratorService } from './script-generator.service';
@@ -12,6 +13,7 @@ import { ScriptProcessor } from './script.processor';
 @Module({
   imports: [
     ConfigModule,
+    AppSettingsModule,
     StateModule,
     BullModule.registerQueue(
       { name: PIPELINE_JOBS.scriptQueue },

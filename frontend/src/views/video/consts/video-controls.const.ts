@@ -13,4 +13,4 @@ export const videoControls = [
   { key: 'height', min: 90, max: 2160, step: 2 },
   { key: 'fps', min: 12, max: 60, step: 1 },
   { key: 'seed', min: 0, max: 4294967295, step: 1 },
-] as const;
+] as const

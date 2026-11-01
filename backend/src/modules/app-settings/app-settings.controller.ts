@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ZodValidationPipe } from '../../pipes/zod-validation.pipe';
 import { AppSettingsService } from './app-settings.service';
 import {
@@ -9,11 +10,14 @@ import {
 
 @Controller('api/app-settings')
 export class AppSettingsController {
-  constructor(private readonly settings: AppSettingsService) {}
+  constructor(
+    private readonly settings: AppSettingsService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get()
   public get(): Promise<PublicAppSettings> {
-    return this.settings.getPublic();
+    return this.settings.getPublic(this.config.get<string>('POLZA_API_KEY'));
   }
 
   @Put()
@@ -21,6 +25,9 @@ export class AppSettingsController {
     @Body(new ZodValidationPipe(appSettingsPatchSchema))
     patch: AppSettingsPatch,
   ): Promise<PublicAppSettings> {
-    return this.settings.update(patch);
+    return this.settings.update(
+      patch,
+      this.config.get<string>('POLZA_API_KEY'),
+    );
   }
 }

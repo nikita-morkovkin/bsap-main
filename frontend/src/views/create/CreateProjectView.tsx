@@ -1,16 +1,16 @@
-import QueryFeedback from "@/components/common/QueryFeedback";
-import { useProjectDefaults } from "@/hooks/queries/useProjectDefaults.hook";
-import ProjectForm from "./ProjectForm";
-import { useMusic } from '@/hooks/queries/useMusic.hook';
+import QueryFeedback from '@/components/common/QueryFeedback'
+import { useProjectDefaults } from '@/hooks/queries/useProjectDefaults.hook'
+import ProjectForm from './ProjectForm'
+import { useMusic } from '@/hooks/queries/useMusic.hook'
 
 const CreateProjectView = () => {
-  const query = useProjectDefaults();
-  const music = useMusic();
+  const query = useProjectDefaults()
+  const music = useMusic()
 
   const handleRetry = () => {
-    query.refetch();
-    music.refetch();
-  };
+    query.refetch()
+    music.refetch()
+  }
 
   return (
     <section className="mx-auto max-w-4xl space-y-6">
@@ -36,10 +36,18 @@ const CreateProjectView = () => {
         />
       )}
       {music.isPending && <p role="status">Loading soundtrack choices…</p>}
-      {music.isError && <QueryFeedback error message="Could not load soundtrack choices." onRetry={handleRetry} />}
-      {query.data && music.data && <ProjectForm defaults={query.data} tracks={music.data.tracks} />}
+      {music.isError && (
+        <QueryFeedback
+          error
+          message="Could not load soundtrack choices."
+          onRetry={handleRetry}
+        />
+      )}
+      {query.data && music.data && (
+        <ProjectForm defaults={query.data} tracks={music.data.tracks} />
+      )}
     </section>
-  );
-};
+  )
+}
 
-export default CreateProjectView;
+export default CreateProjectView

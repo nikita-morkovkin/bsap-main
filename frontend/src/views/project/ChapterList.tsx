@@ -1,26 +1,26 @@
-import { useUiStore } from "@/store/ui.store";
-import type { ProjectState } from "@/types/project.types";
-import { sortedChapters } from "@/utils/project.util";
-import { Accordion } from "@base-ui/react/accordion";
-import ChapterItem from "./ChapterItem";
+import { useUiStore } from '@/store/ui.store'
+import type { ProjectState } from '@/types/project.types'
+import { sortedChapters } from '@/utils/project.util'
+import { Accordion } from '@base-ui/react/accordion'
+import ChapterItem from './ChapterItem'
 
-type ChapterListProps = { state: ProjectState };
+type ChapterListProps = { state: ProjectState }
 
 const ChapterList = ({ state }: ChapterListProps) => {
-  const expanded = useUiStore((store) => store.expandedChapters);
-  const setExpanded = useUiStore((store) => store.setExpandedChapters);
-  const chapters = sortedChapters(state.chapters);
+  const expanded = useUiStore((store) => store.expandedChapters)
+  const setExpanded = useUiStore((store) => store.setExpandedChapters)
+  const chapters = sortedChapters(state.chapters)
 
   const canRegenerate =
-    ["COMPLETED", "FAILED", "IDLE"].includes(state.status) &&
-    chapters.every((chapter) => chapter.ttsStatus === "COMPLETED");
+    ['COMPLETED', 'FAILED', 'IDLE'].includes(state.status) &&
+    chapters.every((chapter) => chapter.ttsStatus === 'COMPLETED')
 
   const timeline = chapters.map((chapter, index) => ({
     chapter,
     startMs: chapters
       .slice(0, index)
       .reduce((sum, item) => sum + item.durationMs, 0),
-  }));
+  }))
 
   return (
     <Accordion.Root
@@ -41,7 +41,7 @@ const ChapterList = ({ state }: ChapterListProps) => {
         />
       ))}
     </Accordion.Root>
-  );
-};
+  )
+}
 
-export default ChapterList;
+export default ChapterList

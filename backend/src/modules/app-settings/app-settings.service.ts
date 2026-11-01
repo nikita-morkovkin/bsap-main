@@ -29,11 +29,16 @@ export class AppSettingsService {
     }
   }
 
-  public async getPublic(): Promise<PublicAppSettings> {
-    return this.toPublic(await this.get());
+  public async getPublic(
+    environmentPolzaApiKey?: string,
+  ): Promise<PublicAppSettings> {
+    return this.toPublic(await this.get(), environmentPolzaApiKey);
   }
 
-  public async update(patch: unknown): Promise<PublicAppSettings> {
+  public async update(
+    patch: unknown,
+    environmentPolzaApiKey?: string,
+  ): Promise<PublicAppSettings> {
     const parsed: AppSettingsPatch = appSettingsPatchSchema.parse(patch);
     const current = await this.get();
     const next = { ...current, ...parsed };
@@ -42,23 +47,45 @@ export class AppSettingsService {
       delete next.lumeanApiKey;
     }
 
+    if (parsed.polzaApiKey === null) {
+      delete next.polzaApiKey;
+    }
+
     const stored = appSettingsSchema.parse(next);
 
     await fs.mkdir(this.state.getProjectsDirectory(), { recursive: true });
     await writeArtifact(this.path(), JSON.stringify(stored, null, 2));
 
-    return this.toPublic(stored);
+    return this.toPublic(stored, environmentPolzaApiKey);
   }
 
-  private toPublic(settings: AppSettings): PublicAppSettings {
-    const key = settings.lumeanApiKey;
+  /** Prefer a Settings credential; use the environment key only as a fallback. */
+  public async getEffectivePolzaApiKey(
+    environmentPolzaApiKey?: string,
+  ): Promise<string | undefined> {
+    const settings = await this.get();
+
+    return (
+      settings.polzaApiKey ?? (environmentPolzaApiKey?.trim() || undefined)
+    );
+  }
+
+  private toPublic(
+    settings: AppSettings,
+    environmentPolzaApiKey?: string,
+  ): PublicAppSettings {
+    const lumeanKey = settings.lumeanApiKey;
+    const polzaKey = settings.polzaApiKey;
 
     return {
       ttsProvider: settings.ttsProvider,
       kokoroDevice: settings.kokoroDevice,
       lumeanService: settings.lumeanService,
-      lumeanApiKeySet: Boolean(key),
-      lumeanApiKeyHint: key ? `…${key.slice(-4)}` : null,
+      lumeanApiKeySet: Boolean(lumeanKey),
+      lumeanApiKeyHint: lumeanKey ? `…${lumeanKey.slice(-4)}` : null,
+      polzaApiKeySet: Boolean(polzaKey),
+      polzaApiKeyHint: polzaKey ? `…${polzaKey.slice(-4)}` : null,
+      polzaApiKeyAvailable: Boolean(polzaKey || environmentPolzaApiKey?.trim()),
     };
   }
 

@@ -1,16 +1,16 @@
-import Badge from "@/components/ui/Badge";
-import type { Chunk, Profile } from "@/types/project.types";
-import ChunkPlaybackButton from "./ChunkPlaybackButton";
-import RegenerateChunkDialog from "./RegenerateChunkDialog";
+import Badge from '@/components/ui/Badge'
+import type { Chunk, Profile } from '@/types/project.types'
+import ChunkPlaybackButton from './ChunkPlaybackButton'
+import RegenerateChunkDialog from './RegenerateChunkDialog'
 
 type ChunkRowProps = {
-  projectId: string;
-  chapterNumber: number;
-  chunk: Chunk;
-  profile: Profile;
-  revision: string;
-  canRegenerate: boolean;
-};
+  projectId: string
+  chapterNumber: number
+  chunk: Chunk
+  profile: Profile
+  revision: string
+  canRegenerate: boolean
+}
 
 const ChunkRow = ({
   projectId,
@@ -20,9 +20,9 @@ const ChunkRow = ({
   revision,
   canRegenerate,
 }: ChunkRowProps) => {
-  const playbackDisabled = chunk.status !== "COMPLETED";
-  const regenerateDisabled = !canRegenerate;
-  const variant = chunk.status === "FAILED" ? "destructive" : "secondary";
+  const playbackDisabled = chunk.status !== 'COMPLETED'
+  const regenerateDisabled = !canRegenerate
+  const variant = chunk.status === 'FAILED' ? 'destructive' : 'secondary'
 
   return (
     <li className="space-y-3 rounded-xl border bg-background p-4">
@@ -48,7 +48,7 @@ const ChunkRow = ({
         />
       </div>
     </li>
-  );
-};
+  )
+}
 
-export default ChunkRow;
+export default ChunkRow

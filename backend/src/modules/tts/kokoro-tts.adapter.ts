@@ -110,7 +110,7 @@ export class KokoroTtsAdapter implements ITtsAdapter {
 
     const hint =
       device === 'gpu'
-        ? 'The GPU Kokoro service is not running. Start it with: docker compose --profile gpu up -d kokoro-tts-gpu, or switch Kokoro to CPU in Settings.'
+        ? 'The GPU Kokoro service is not running. Start it with: docker compose up -d kokoro-tts-gpu, or switch Kokoro to CPU in Settings.'
         : 'The CPU Kokoro service is not reachable.';
 
     return new Error(

@@ -1,10 +1,10 @@
-import { Slider as SliderPrimitive } from '@base-ui/react/slider';
-import { cn } from 'cn';
+import { Slider as SliderPrimitive } from '@base-ui/react/slider'
+import { cn } from 'cn'
 
-type SliderProps = SliderPrimitive.Root.Props;
+type SliderProps = SliderPrimitive.Root.Props
 
 const Slider = ({ className, ...props }: SliderProps) => {
-  const classes = cn('w-full', className);
+  const classes = cn('w-full', className)
 
   return (
     <SliderPrimitive.Root className={classes} {...props}>
@@ -15,8 +15,8 @@ const Slider = ({ className, ...props }: SliderProps) => {
         <SliderPrimitive.Thumb className="size-5 cursor-grab rounded-full border bg-background shadow outline-none active:cursor-grabbing focus-visible:ring-3 focus-visible:ring-ring" />
       </SliderPrimitive.Control>
     </SliderPrimitive.Root>
-  );
-};
+  )
+}
 
-export { Slider };
-export default Slider;
+export { Slider }
+export default Slider

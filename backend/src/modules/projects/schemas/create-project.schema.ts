@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { profileSchema, stateSchema } from '../../state/schemas';
+import { profileSchema } from '../../state/schemas';
 import { musicSelectionSchema } from '../../music/schemas/music-selection.schema';
 
 export const createProjectSchema = z.strictObject({

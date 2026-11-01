@@ -1,15 +1,18 @@
-import { cva } from 'class-variance-authority';
+import { cva } from 'class-variance-authority'
 
 export const buttonVariants = cva(
   'inline-flex shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/85',
+        default:
+          'border-transparent bg-primary text-primary-foreground hover:bg-primary/85',
         outline: 'border-border bg-background hover:bg-muted',
-        secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        secondary:
+          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'border-transparent hover:bg-muted',
-        destructive: 'border-transparent bg-destructive/10 text-destructive hover:bg-destructive/20',
+        destructive:
+          'border-transparent bg-destructive/10 text-destructive hover:bg-destructive/20',
         link: 'border-transparent text-primary underline-offset-4 hover:underline',
       },
       size: {
@@ -25,4 +28,4 @@ export const buttonVariants = cva(
     },
     defaultVariants: { variant: 'default', size: 'default' },
   },
-);
+)

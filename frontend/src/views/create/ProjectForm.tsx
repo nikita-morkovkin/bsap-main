@@ -1,61 +1,59 @@
-import CatalogSelect from "@/components/common/CatalogSelect";
-import MusicSelector from "@/components/music/MusicSelector";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Slider } from "@/components/ui/Slider";
-import { useModels, useVoices } from "@/hooks/queries/useSettings.hook";
-import { useProjectForm } from "@/hooks/useProjectForm.hook";
-import type { MusicTrack } from "@/types/music.types";
-import type { Profile } from "@/types/project.types";
-import { getModelEffort } from "@/utils/settings.util";
-import { Sparkles } from "lucide-react";
-import type { SubmitEvent } from "react";
-import ProfileTextField from "./ProfileTextField";
-import PromptStudio from "./PromptStudio";
-import StockPicker from "./StockPicker";
-import ReasoningSelect from "./ReasoningSelect";
+import CatalogSelect from '@/components/common/CatalogSelect'
+import MusicSelector from '@/components/music/MusicSelector'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Slider } from '@/components/ui/Slider'
+import { useModels, useVoices } from '@/hooks/queries/useSettings.hook'
+import { useProjectForm } from '@/hooks/useProjectForm.hook'
+import type { MusicTrack } from '@/types/music.types'
+import type { Profile } from '@/types/project.types'
+import { getModelEffort } from '@/utils/settings.util'
+import { Sparkles } from 'lucide-react'
+import type { SubmitEvent } from 'react'
+import ProfileTextField from './ProfileTextField'
+import PromptStudio from './PromptStudio'
+import StockPicker from './StockPicker'
+import ReasoningSelect from './ReasoningSelect'
 
-type ProjectFormProps = { defaults: Profile; tracks: MusicTrack[] };
+type ProjectFormProps = { defaults: Profile; tracks: MusicTrack[] }
 
 const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
-  const form = useProjectForm({ defaults, tracks });
-  const { profile } = form;
-  const models = useModels();
-  const voices = useVoices();
+  const form = useProjectForm({ defaults, tracks })
+  const { profile } = form
+  const models = useModels()
+  const voices = useVoices()
 
   const architect = models.data?.find(
     (model) => model.id === profile.architectModel,
-  );
+  )
 
-  const writer = models.data?.find((model) => model.id === profile.writerModel);
+  const writer = models.data?.find((model) => model.id === profile.writerModel)
 
   const architectEffort = getModelEffort(
     architect,
     profile.architectReasoningEffort,
-  );
+  )
 
-  const writerEffort = getModelEffort(writer, profile.writerReasoningEffort);
-  const validVoice = voices.data?.some(
-    (voice) => voice.id === profile.ttsVoice,
-  );
+  const writerEffort = getModelEffort(writer, profile.writerReasoningEffort)
+  const validVoice = voices.data?.some((voice) => voice.id === profile.ttsVoice)
 
   const ready =
-    !!architect && !!writer && validVoice && !models.isError && !voices.isError;
-  const speedLabel = `Narration speed · ${profile.ttsSpeed.toFixed(2)}×`;
-  const speedValue = [profile.ttsSpeed];
-  const submitLabel = form.isPending ? "Queuing episode…" : "Create episode";
+    !!architect && !!writer && validVoice && !models.isError && !voices.isError
+  const speedLabel = `Narration speed · ${profile.ttsSpeed.toFixed(2)}×`
+  const speedValue = [profile.ttsSpeed]
+  const submitLabel = form.isPending ? 'Queuing episode…' : 'Create episode'
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     if (!ready) {
-      event.preventDefault();
-      return;
+      event.preventDefault()
+      return
     }
 
     form.handleSubmit(event, {
       architectReasoningEffort: architectEffort,
       writerReasoningEffort: writerEffort,
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={(event) => handleSubmit(event)} className="space-y-6">
@@ -119,26 +117,26 @@ const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
           )}
         </label>
         <div className="grid gap-5 sm:grid-cols-2">
-          {(["architect", "writer"] as const).map((role) => (
+          {(['architect', 'writer'] as const).map((role) => (
             <CatalogSelect
               key={role}
-              label={role === "architect" ? "Architect model" : "Writer model"}
+              label={role === 'architect' ? 'Architect model' : 'Writer model'}
               value={profile[`${role}Model`]}
               options={models.data ?? []}
               loading={models.isPending}
               error={models.isError}
               onRetry={() => models.refetch()}
               onChange={(value) => {
-                const model = models.data?.find((item) => item.id === value);
+                const model = models.data?.find((item) => item.id === value)
 
-                if (role === "architect") {
+                if (role === 'architect') {
                   form.updateProfile({
                     architectModel: value,
                     architectReasoningEffort: getModelEffort(
                       model,
                       profile.architectReasoningEffort,
                     ),
-                  });
+                  })
                 } else {
                   form.updateProfile({
                     writerModel: value,
@@ -146,7 +144,7 @@ const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
                       model,
                       profile.writerReasoningEffort,
                     ),
-                  });
+                  })
                 }
               }}
             />
@@ -230,7 +228,7 @@ const ProjectForm = ({ defaults, tracks }: ProjectFormProps) => {
         </Button>
       </fieldset>
     </form>
-  );
-};
+  )
+}
 
-export default ProjectForm;
+export default ProjectForm

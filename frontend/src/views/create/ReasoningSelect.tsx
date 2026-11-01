@@ -3,15 +3,15 @@ import Select, {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/Select";
-import type { ReasoningEffort } from "@/types/project.types";
+} from '@/components/ui/Select'
+import type { ReasoningEffort } from '@/types/project.types'
 
 type ReasoningSelectProps = {
-  label: string;
-  value: ReasoningEffort;
-  onChange: (value: ReasoningEffort | null) => void;
-  options: string[];
-};
+  label: string
+  value: ReasoningEffort
+  onChange: (value: ReasoningEffort | null) => void
+  options: string[]
+}
 
 const ReasoningSelect = ({
   label,
@@ -28,7 +28,11 @@ const ReasoningSelect = ({
       >
         <SelectTrigger aria-label={label} className="w-full">
           <SelectValue
-            placeholder={options.length ? "Select effort" : "Not configurable for this model"}
+            placeholder={
+              options.length
+                ? 'Select effort'
+                : 'Not configurable for this model'
+            }
           />
         </SelectTrigger>
         <SelectContent>
@@ -41,7 +45,7 @@ const ReasoningSelect = ({
       </Select>
       <span className="order-first">{label}</span>
     </div>
-  );
-};
+  )
+}
 
-export default ReasoningSelect;
+export default ReasoningSelect

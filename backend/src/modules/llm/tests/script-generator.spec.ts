@@ -5,6 +5,7 @@ import { promises as fs } from 'fs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 import { PIPELINE_JOBS } from '../../queue/consts/pipeline-jobs.const';
+import { AppSettingsService } from '../../app-settings/app-settings.service';
 import { profileSchema } from '../../state/schemas/profile.schema';
 import { StateManagerService } from '../../state/state-manager.service';
 import { PolzaLlmService } from '../polza-llm.service';
@@ -59,6 +60,13 @@ describe('Two-chapter script production and disk recovery', () => {
         {
           provide: getQueueToken(PIPELINE_JOBS.textQueue),
           useValue: { add, getJob: jest.fn() },
+        },
+        {
+          provide: AppSettingsService,
+          useValue: {
+            getEffectivePolzaApiKey: (environmentKey?: string) =>
+              Promise.resolve(environmentKey),
+          },
         },
       ],
     }).compile();

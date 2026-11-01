@@ -30,7 +30,7 @@ const modelsSchema = z.object({
   ),
 });
 const lumeanVoiceSchema = z.object({
-  id: z.string().optional(),
+  id: z.union([z.string(), z.number()]).optional(),
   voice_id: z.string().optional(),
   name: z.string().optional(),
   display_name: z.string().optional(),
@@ -67,11 +67,21 @@ export class CatalogService {
   ) {}
 
   public async getModels() {
+    const apiKey = await this.appSettings.getEffectivePolzaApiKey(
+      this.config.get<string>('POLZA_API_KEY'),
+    );
+
+    if (!apiKey) {
+      throw new ServiceUnavailableException(
+        'Polza.AI API key is not configured. Add one in Settings or configure POLZA_API_KEY.',
+      );
+    }
+
     const result = modelsSchema.safeParse(
       await this.getJson(
         `${this.config.getOrThrow<string>('POLZA_API_URL').replace(/\/+$/, '')}/models`,
         {
-          Authorization: `Bearer ${this.config.getOrThrow<string>('POLZA_API_KEY')}`,
+          Authorization: `Bearer ${apiKey}`,
         },
       ),
     );
@@ -110,9 +120,7 @@ export class CatalogService {
           'http://kokoro-tts-gpu:8880')
         : this.config.getOrThrow<string>('KOKORO_TTS_URL');
     const result = voicesSchema.safeParse(
-      await this.getJson(
-        `${baseUrl.replace(/\/+$/, '')}/v1/audio/voices`,
-      ),
+      await this.getJson(`${baseUrl.replace(/\/+$/, '')}/v1/audio/voices`),
     );
     if (!result.success)
       throw new ServiceUnavailableException(
@@ -136,7 +144,7 @@ export class CatalogService {
       .replace(/\/+$/, '');
     const url =
       service === 'elevenlabs'
-        ? `${base}/voices/elevenlabs/library?page=0&page_size=100`
+        ? `${base}/voices/elevenlabs/library?page=0&page_size=50`
         : `${base}/voices/cartesia?page=1&per_page=100`;
     const response = await fetch(url, {
       headers: { 'X-API-KEY': apiKey },
@@ -161,13 +169,18 @@ export class CatalogService {
     const list = lumeanVoicesSchema.safeParse(payload);
 
     if (!list.success) {
+      const invalidPaths = list.error.issues
+        .map((issue) => issue.path.join('.') || '<root>')
+        .join(', ');
       throw new ServiceUnavailableException(
-        'Invalid Lumean voice catalog. Please retry.',
+        `Invalid Lumean voice catalog response (${invalidPaths}). Please retry.`,
       );
     }
 
     return list.data.data.flatMap((voice) => {
-      const id = voice.voice_id ?? voice.id;
+      // A numeric id is a Lumean catalog record ID, not a TTS voice ID.
+      const id =
+        voice.voice_id || (typeof voice.id === 'string' ? voice.id : undefined);
 
       return id ? [{ id, name: voice.name ?? voice.display_name ?? id }] : [];
     });

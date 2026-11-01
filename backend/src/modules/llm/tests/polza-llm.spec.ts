@@ -12,12 +12,14 @@ describe('PolzaLlmService with the real AI SDK and a local HTTP gateway', () => 
   let finishReason: string;
   let expectedAuthorization: string;
   let failOnce: boolean;
+  let savedApiKey: string | undefined;
 
   beforeEach(async () => {
     requests = [];
     finishReason = 'stop';
     expectedAuthorization = 'Bearer test-key';
     failOnce = false;
+    savedApiKey = undefined;
     server = createServer((request, response) => {
       let body = '';
 
@@ -116,6 +118,10 @@ describe('PolzaLlmService with the real AI SDK and a local HTTP gateway', () => 
         POLZA_API_URL: `http://127.0.0.1:${address.port}/v1`,
         POLZA_API_KEY: 'test-key',
       }),
+      {
+        getEffectivePolzaApiKey: (environmentKey?: string) =>
+          Promise.resolve(savedApiKey ?? environmentKey),
+      } as never,
     );
   });
 
@@ -195,16 +201,56 @@ describe('PolzaLlmService with the real AI SDK and a local HTTP gateway', () => 
     expect(requests).toHaveLength(2);
   });
 
-  it('requires a non-empty API key', () => {
-    expect(
-      () =>
-        new PolzaLlmService(
-          new ConfigService({
-            POLZA_API_URL: 'http://127.0.0.1/v1',
-            POLZA_API_KEY: '   ',
-          }),
-        ),
-    ).toThrow('POLZA_API_KEY must not be empty');
+  it('uses a saved key immediately and restores the environment fallback when removed', async () => {
+    savedApiKey = 'saved-key-one';
+    expectedAuthorization = 'Bearer saved-key-one';
+
+    await service.generateText({
+      model: 'architect',
+      system: 'Outline.',
+      prompt: 'Stars',
+      reasoningEffort: 'low',
+      temperature: 0.7,
+    });
+
+    savedApiKey = 'saved-key-two';
+    expectedAuthorization = 'Bearer saved-key-two';
+
+    await service.streamText({
+      model: 'writer',
+      system: 'Narrate.',
+      prompt: 'Stars',
+      reasoningEffort: 'none',
+      temperature: 0.7,
+    });
+
+    savedApiKey = undefined;
+    expectedAuthorization = 'Bearer test-key';
+
+    await service.generateText({
+      model: 'architect',
+      system: 'Outline.',
+      prompt: 'Stars',
+      reasoningEffort: 'low',
+      temperature: 0.7,
+    });
+  });
+
+  it('fails clearly when neither a saved key nor an environment key exists', async () => {
+    const missingKeyService = new PolzaLlmService(
+      new ConfigService({ POLZA_API_URL: 'http://127.0.0.1/v1' }),
+      { getEffectivePolzaApiKey: () => Promise.resolve(undefined) } as never,
+    );
+
+    await expect(
+      missingKeyService.generateText({
+        model: 'architect',
+        system: 'Outline.',
+        prompt: 'Stars',
+        reasoningEffort: 'low',
+        temperature: 0.7,
+      }),
+    ).rejects.toThrow('Add one in Settings or configure POLZA_API_KEY');
   });
 
   it('extracts fenced JSON but rejects schema-invalid outlines', () => {

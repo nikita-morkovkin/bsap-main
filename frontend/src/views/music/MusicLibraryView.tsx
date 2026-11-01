@@ -1,13 +1,13 @@
-import { useMusic } from "@/hooks/queries/useMusic.hook";
-import MusicTrackRow from "./MusicTrackRow";
-import MusicUploadForm from "./MusicUploadForm";
+import { useMusic } from '@/hooks/queries/useMusic.hook'
+import MusicTrackRow from './MusicTrackRow'
+import MusicUploadForm from './MusicUploadForm'
 
 const MusicLibraryView = () => {
-  const query = useMusic();
+  const query = useMusic()
 
   const handleRetry = () => {
-    query.refetch();
-  };
+    query.refetch()
+  }
 
   return (
     <section className="space-y-6">
@@ -36,7 +36,7 @@ const MusicLibraryView = () => {
         <p>No music yet. Upload a WAV or MP3 to begin.</p>
       )}
     </section>
-  );
-};
+  )
+}
 
-export default MusicLibraryView;
+export default MusicLibraryView

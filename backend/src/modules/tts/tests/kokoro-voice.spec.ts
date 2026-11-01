@@ -110,7 +110,7 @@ describe('Kokoro device selection', () => {
           ttsVoice: 'bm_george',
           ttsSpeed: 0.85,
         } as Profile),
-      ).rejects.toThrow('docker compose --profile gpu up -d kokoro-tts-gpu');
+      ).rejects.toThrow('docker compose up -d kokoro-tts-gpu');
     } finally {
       await fs.rm(directory, { recursive: true, force: true });
     }

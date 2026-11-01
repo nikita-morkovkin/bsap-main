@@ -1,134 +1,134 @@
-import { apiClient } from "@/api/apiClient";
-import Button from "@/components/ui/Button";
-import type { StockClip } from "@/types/video.types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ChangeEvent } from "react";
-import { useState } from "react";
-import { toast } from "sonner";
-import ClipCard from "./ClipCard";
-import ClipDropzone from "./ClipDropzone";
-import UploadQueue from "./UploadQueue";
-import { videoText } from "./consts/video-text.const";
-import { useClipUpload } from "./hooks/useClipUpload.hook";
+import { apiClient } from '@/api/apiClient'
+import Button from '@/components/ui/Button'
+import type { StockClip } from '@/types/video.types'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ChangeEvent } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import ClipCard from './ClipCard'
+import ClipDropzone from './ClipDropzone'
+import UploadQueue from './UploadQueue'
+import { videoText } from './consts/video-text.const'
+import { useClipUpload } from './hooks/useClipUpload.hook'
 
-type StockLibraryProps = { projectId: string; busy: boolean };
+type StockLibraryProps = { projectId: string; busy: boolean }
 
 const StockLibrary = ({ projectId, busy }: StockLibraryProps) => {
-  const client = useQueryClient();
-  const queryKey = ["video-clips", projectId];
+  const client = useQueryClient()
+  const queryKey = ['video-clips', projectId]
   const query = useQuery({
     queryKey,
     queryFn: () => apiClient.video.clips(projectId),
     refetchInterval: 5000,
-  });
-  const upload = useClipUpload({ projectId, onUploaded: query.refetch });
-  const [page, setPage] = useState(0);
-  const [sort, setSort] = useState("name");
-  const [enabledOnly, setEnabledOnly] = useState(false);
+  })
+  const upload = useClipUpload({ projectId, onUploaded: query.refetch })
+  const [page, setPage] = useState(0)
+  const [sort, setSort] = useState('name')
+  const [enabledOnly, setEnabledOnly] = useState(false)
 
-  const clips = query.data ?? [];
+  const clips = query.data ?? []
   const sorted = [...clips]
     .filter((clip) => !enabledOnly || clip.enabled)
     .sort((a, b) =>
-      sort === "duration"
+      sort === 'duration'
         ? a.durationSec - b.durationSec
         : a.originalName.localeCompare(b.originalName),
-    );
-  const maxPage = Math.max(0, Math.ceil(sorted.length / 24) - 1);
-  const currentPage = Math.min(page, maxPage);
-  const visible = sorted.slice(currentPage * 24, (currentPage + 1) * 24);
-  const source = clips.reduce((sum, clip) => sum + clip.durationSec, 0) / 60;
+    )
+  const maxPage = Math.max(0, Math.ceil(sorted.length / 24) - 1)
+  const currentPage = Math.min(page, maxPage)
+  const visible = sorted.slice(currentPage * 24, (currentPage + 1) * 24)
+  const source = clips.reduce((sum, clip) => sum + clip.durationSec, 0) / 60
   const effective =
     clips
       .filter((clip) => clip.enabled)
       .reduce(
         (sum, clip) => sum + (clip.plannedDurationSec ?? clip.durationSec),
         0,
-      ) / 60;
+      ) / 60
   const handleError = () => {
-    toast.error(videoText.error);
-  };
+    toast.error(videoText.error)
+  }
 
   const toggle = async (clip: StockClip) => {
-    await client.cancelQueries({ queryKey });
+    await client.cancelQueries({ queryKey })
 
-    const previous = client.getQueryData<StockClip[]>(queryKey);
+    const previous = client.getQueryData<StockClip[]>(queryKey)
 
     client.setQueryData<StockClip[]>(queryKey, (current) =>
       current?.map((item) =>
         item.id === clip.id ? { ...item, enabled: !item.enabled } : item,
       ),
-    );
+    )
 
     try {
-      await apiClient.video.toggle(projectId, clip.id, !clip.enabled);
+      await apiClient.video.toggle(projectId, clip.id, !clip.enabled)
     } catch {
-      client.setQueryData(queryKey, previous);
+      client.setQueryData(queryKey, previous)
 
-      handleError();
+      handleError()
     }
-  };
+  }
 
   const remove = (clip: StockClip) => {
     apiClient.video
       .delete(projectId, clip.id)
       .then(() => query.refetch())
-      .catch(handleError);
-  };
+      .catch(handleError)
+  }
 
   const bulk = async (enabled: boolean) => {
     try {
       for (const clip of clips) {
         if (clip.enabled !== enabled) {
-          await apiClient.video.toggle(projectId, clip.id, enabled);
+          await apiClient.video.toggle(projectId, clip.id, enabled)
         }
       }
 
-      await query.refetch();
+      await query.refetch()
     } catch {
-      handleError();
+      handleError()
     }
-  };
+  }
 
   const enableAll = () => {
-    bulk(true);
-  };
+    bulk(true)
+  }
 
   const disableAll = () => {
-    bulk(false);
-  };
+    bulk(false)
+  }
 
   const next = () => {
-    setPage(currentPage + 1);
-  };
+    setPage(currentPage + 1)
+  }
 
   const previous = () => {
-    setPage(Math.max(0, currentPage - 1));
-  };
+    setPage(Math.max(0, currentPage - 1))
+  }
 
   const changeSort = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSort(event.target.value);
-  };
+    setSort(event.target.value)
+  }
 
   const changeFilter = (event: ChangeEvent<HTMLInputElement>) => {
-    setEnabledOnly(event.target.checked);
-  };
+    setEnabledOnly(event.target.checked)
+  }
 
-  const firstPage = currentPage === 0;
-  const lastPage = currentPage === maxPage;
+  const firstPage = currentPage === 0
+  const lastPage = currentPage === maxPage
 
   return (
     <section className="space-y-4">
       <h3 className="text-lg font-semibold">{videoText.library}</h3>
       <p className="text-sm">
-        {clips.length} {videoText.clips} · {source.toFixed(1)}{" "}
+        {clips.length} {videoText.clips} · {source.toFixed(1)}{' '}
         {videoText.source} · {effective.toFixed(1)} {videoText.effective}
       </p>
       <ClipDropzone onFiles={upload.enqueue} />
       <UploadQueue items={upload.items} onRetry={upload.retry} />
       <div className="flex flex-wrap items-center gap-3">
         <label>
-          {videoText.sort}{" "}
+          {videoText.sort}{' '}
           <select value={sort} onChange={changeSort}>
             <option value="name">{videoText.name}</option>
             <option value="duration">{videoText.duration}</option>
@@ -139,7 +139,7 @@ const StockLibrary = ({ projectId, busy }: StockLibraryProps) => {
             type="checkbox"
             checked={enabledOnly}
             onChange={changeFilter}
-          />{" "}
+          />{' '}
           {videoText.active}
         </label>
         <Button variant="outline" disabled={busy} onClick={enableAll}>
@@ -173,7 +173,7 @@ const StockLibrary = ({ projectId, busy }: StockLibraryProps) => {
         </Button>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default StockLibrary;
+export default StockLibrary

@@ -1,9 +1,17 @@
-import { mediaApi } from './media.api';
-import { projectsApi } from './projects.api';
-import { musicApi } from './music.api';
-import { videoApi } from './video.api';
-import { exportsApi } from './exports.api';
-import { effectsApi } from './effects.api';
-import { appSettingsApi } from './app-settings.api';
+import { appSettingsApi } from './app-settings.api'
+import { effectsApi } from './effects.api'
+import { exportsApi } from './exports.api'
+import { mediaApi } from './media.api'
+import { musicApi } from './music.api'
+import { projectsApi } from './projects.api'
+import { videoApi } from './video.api'
 
-export const apiClient = { projects: projectsApi, media: mediaApi, music: musicApi, video: videoApi, exports: exportsApi, effects: effectsApi, appSettings: appSettingsApi };
+export const apiClient = {
+  projects: projectsApi,
+  media: mediaApi,
+  music: musicApi,
+  video: videoApi,
+  exports: exportsApi,
+  effects: effectsApi,
+  appSettings: appSettingsApi,
+}

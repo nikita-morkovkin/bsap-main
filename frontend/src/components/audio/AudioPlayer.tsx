@@ -1,40 +1,40 @@
-import { Button } from "@/components/ui/Button";
-import { useAudioPlayerStore } from "@/store/audioPlayer.store";
-import { useEffect, useRef } from "react";
-import { toast } from "sonner";
-import Slider from "../ui/Slider";
+import { Button } from '@/components/ui/Button'
+import { useAudioPlayerStore } from '@/store/audioPlayer.store'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
+import Slider from '../ui/Slider'
 
 const AudioPlayer = () => {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const audioUrl = useAudioPlayerStore((state) => state.audioUrl);
-  const isPlaying = useAudioPlayerStore((state) => state.isPlaying);
-  const activeChunkId = useAudioPlayerStore((state) => state.activeChunkId);
-  const volume = useAudioPlayerStore((state) => state.volume);
-  const pause = useAudioPlayerStore((state) => state.pause);
-  const reset = useAudioPlayerStore((state) => state.reset);
-  const setVolume = useAudioPlayerStore((state) => state.setVolume);
-  const source = audioUrl ?? undefined;
-  const pauseDisabled = !isPlaying;
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const audioUrl = useAudioPlayerStore((state) => state.audioUrl)
+  const isPlaying = useAudioPlayerStore((state) => state.isPlaying)
+  const activeChunkId = useAudioPlayerStore((state) => state.activeChunkId)
+  const volume = useAudioPlayerStore((state) => state.volume)
+  const pause = useAudioPlayerStore((state) => state.pause)
+  const reset = useAudioPlayerStore((state) => state.reset)
+  const setVolume = useAudioPlayerStore((state) => state.setVolume)
+  const source = audioUrl ?? undefined
+  const pauseDisabled = !isPlaying
 
   const handleError = () => {
-    pause();
-    toast.error("Audio preview unavailable. Try playing the chunk again.");
-  };
+    pause()
+    toast.error('Audio preview unavailable. Try playing the chunk again.')
+  }
 
   const handleVolume = (value: number | readonly number[]) => {
-    const nextVolume = typeof value === "number" ? value : value[0];
+    const nextVolume = typeof value === 'number' ? value : value[0]
 
     if (nextVolume !== undefined) {
-      setVolume(nextVolume);
+      setVolume(nextVolume)
     }
-  };
+  }
 
   useEffect(() => {
-    const audio = audioRef.current;
-    let cancelled = false;
+    const audio = audioRef.current
+    let cancelled = false
 
     if (!audio) {
-      return;
+      return
     }
 
     if (isPlaying && audioUrl) {
@@ -43,24 +43,24 @@ const AudioPlayer = () => {
           !cancelled &&
           useAudioPlayerStore.getState().audioUrl === audioUrl
         ) {
-          pause();
-          toast.error("Playback could not start. Try playing the chunk again.");
+          pause()
+          toast.error('Playback could not start. Try playing the chunk again.')
         }
-      });
+      })
     } else {
-      audio.pause();
+      audio.pause()
     }
 
     return () => {
-      cancelled = true;
-    };
-  }, [audioUrl, isPlaying, pause]);
+      cancelled = true
+    }
+  }, [audioUrl, isPlaying, pause])
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume;
+      audioRef.current.volume = volume
     }
-  }, [volume]);
+  }, [volume])
 
   return (
     <aside
@@ -74,6 +74,7 @@ const AudioPlayer = () => {
         onError={handleError}
         preload="none"
       />
+
       {activeChunkId ? (
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 text-sm">
           <span className="min-w-0 flex-1 truncate">
@@ -104,7 +105,7 @@ const AudioPlayer = () => {
         </p>
       )}
     </aside>
-  );
-};
+  )
+}
 
-export default AudioPlayer;
+export default AudioPlayer

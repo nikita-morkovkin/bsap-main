@@ -1,17 +1,17 @@
-import AudioPlayer from "@/components/audio/AudioPlayer";
-import Navigation from "@/components/layout/Navigation";
-import Sidebar from "@/components/layout/Sidebar";
-import { useUiStore } from "@/store/ui.store";
-import CreateProjectView from "@/views/create/CreateProjectView";
-import DownloadsPanel from "@/views/downloads/DownloadsPanel";
-import MusicLibraryView from "@/views/music/MusicLibraryView";
-import SettingsView from "@/views/settings/SettingsView";
-import ProjectDetailView from "@/views/project/ProjectDetailView";
+import AudioPlayer from '@/components/audio/AudioPlayer'
+import Navigation from '@/components/layout/Navigation'
+import Sidebar from '@/components/layout/Sidebar'
+import { useUiStore } from '@/store/ui.store'
+import CreateProjectView from '@/views/create/CreateProjectView'
+import DownloadsPanel from '@/views/downloads/DownloadsPanel'
+import MusicLibraryView from '@/views/music/MusicLibraryView'
+import ProjectDetailView from '@/views/project/ProjectDetailView'
+import SettingsView from '@/views/settings/SettingsView'
 
 const App = () => {
-  const activeTab = useUiStore((state) => state.activeTab);
-  const projectId = useUiStore((state) => state.selectedProjectId);
-  const createHidden = activeTab !== "create";
+  const activeTab = useUiStore((state) => state.activeTab)
+  const projectId = useUiStore((state) => state.selectedProjectId)
+  const createHidden = activeTab !== 'create'
 
   return (
     <div className="min-h-dvh lg:flex">
@@ -22,19 +22,19 @@ const App = () => {
           <div hidden={createHidden}>
             <CreateProjectView />
           </div>
-          {activeTab === "music" && <MusicLibraryView />}
-          {activeTab === "settings" && <SettingsView />}
-          {activeTab === "monitor" && projectId && (
+          {activeTab === 'music' && <MusicLibraryView />}
+          {activeTab === 'settings' && <SettingsView />}
+          {activeTab === 'monitor' && projectId && (
             <ProjectDetailView projectId={projectId} />
           )}
-          {activeTab === "downloads" && projectId && (
+          {activeTab === 'downloads' && projectId && (
             <DownloadsPanel projectId={projectId} />
           )}
         </main>
         <AudioPlayer />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

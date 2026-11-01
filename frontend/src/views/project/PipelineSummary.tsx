@@ -1,37 +1,37 @@
-import Badge from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Progress } from "@/components/ui/Progress";
-import { useCancelOutlineMutation } from "@/hooks/mutations/useCancelOutlineMutation.hook";
-import { useResumeProjectMutation } from "@/hooks/mutations/useResumeProjectMutation.hook";
-import type { ProjectState } from "@/types/project.types";
+import Badge from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { Progress } from '@/components/ui/Progress'
+import { useCancelOutlineMutation } from '@/hooks/mutations/useCancelOutlineMutation.hook'
+import { useResumeProjectMutation } from '@/hooks/mutations/useResumeProjectMutation.hook'
+import type { ProjectState } from '@/types/project.types'
 
-type PipelineSummaryProps = { state: ProjectState };
+type PipelineSummaryProps = { state: ProjectState }
 
 const PipelineSummary = ({ state }: PipelineSummaryProps) => {
-  const mutation = useResumeProjectMutation({ id: state.projectId });
-  const cancelMutation = useCancelOutlineMutation({ id: state.projectId });
+  const mutation = useResumeProjectMutation({ id: state.projectId })
+  const cancelMutation = useCancelOutlineMutation({ id: state.projectId })
   const chunks = Object.values(state.chapters).flatMap(
     (chapter) => chapter.chunks,
-  );
+  )
   const completed = chunks.filter(
-    (chunk) => chunk.status === "COMPLETED",
-  ).length;
+    (chunk) => chunk.status === 'COMPLETED',
+  ).length
   const progress =
-    chunks.length > 0 ? Math.round((completed / chunks.length) * 100) : 0;
-  const variant = state.status === "FAILED" ? "destructive" : "secondary";
+    chunks.length > 0 ? Math.round((completed / chunks.length) * 100) : 0
+  const variant = state.status === 'FAILED' ? 'destructive' : 'secondary'
   const showResume =
-    state.status === "FAILED" ||
-    state.status === "IDLE" ||
-    state.status === "CANCELLED";
-  const showCancel = state.status === "GENERATING_OUTLINE";
-  const resumeLabel = mutation.isPending ? "Resuming…" : "Resume pipeline";
-  const handleResume = () => mutation.mutate();
+    state.status === 'FAILED' ||
+    state.status === 'IDLE' ||
+    state.status === 'CANCELLED'
+  const showCancel = state.status === 'GENERATING_OUTLINE'
+  const resumeLabel = mutation.isPending ? 'Resuming…' : 'Resume pipeline'
+  const handleResume = () => mutation.mutate()
 
   return (
     <div className="space-y-4 rounded-2xl border bg-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Badge variant={variant}>{state.status.replaceAll("_", " ")}</Badge>
+          <Badge variant={variant}>{state.status.replaceAll('_', ' ')}</Badge>
           {showCancel && (
             <Button
               variant="destructive"
@@ -40,7 +40,7 @@ const PipelineSummary = ({ state }: PipelineSummaryProps) => {
               disabled={cancelMutation.isPending}
               aria-label="Cancel outline generation"
             >
-              {cancelMutation.isPending ? "Cancelling…" : "Emergency cancel"}
+              {cancelMutation.isPending ? 'Cancelling…' : 'Emergency cancel'}
             </Button>
           )}
         </div>
@@ -69,7 +69,7 @@ const PipelineSummary = ({ state }: PipelineSummaryProps) => {
         cancelled episodes stop polling.
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default PipelineSummary;
+export default PipelineSummary

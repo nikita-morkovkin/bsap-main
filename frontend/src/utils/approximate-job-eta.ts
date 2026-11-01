@@ -9,27 +9,27 @@ export const approximateJobEta = (
   now: number,
 ): number | undefined => {
   if (!Number.isFinite(progress) || progress < 0.1 || progress >= 0.98) {
-    return undefined;
+    return undefined
   }
 
-  const elapsedSeconds = (now - new Date(startedAt).getTime()) / 1000;
+  const elapsedSeconds = (now - new Date(startedAt).getTime()) / 1000
 
   if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) {
-    return undefined;
+    return undefined
   }
 
-  return Math.max(1, Math.round((elapsedSeconds * (1 - progress)) / progress));
-};
+  return Math.max(1, Math.round((elapsedSeconds * (1 - progress)) / progress))
+}
 
 export const formatApproximateJobEta = (seconds: number): string => {
   if (seconds < 60) {
-    return `~${seconds}s remaining`;
+    return `~${seconds}s remaining`
   }
 
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
 
   return remainder < 10
     ? `~${minutes}m remaining`
-    : `~${minutes}m ${remainder}s remaining`;
-};
+    : `~${minutes}m ${remainder}s remaining`
+}

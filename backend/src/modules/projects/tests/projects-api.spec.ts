@@ -196,15 +196,28 @@ describe('Projects REST API', () => {
   it('validates creation payloads and enqueues the outline pipeline', async () => {
     await request(app.getHttpServer())
       .post('/api/projects')
-      .send({ title: 'Ocean', description: 'A deep journey', profile: { ...profile, ttsSpeed: 0 } })
+      .send({
+        title: 'Ocean',
+        description: 'A deep journey',
+        profile: { ...profile, ttsSpeed: 0 },
+      })
       .expect(400);
     await request(app.getHttpServer())
       .post('/api/projects')
-      .send({ title: 'Ocean', description: 'A deep journey', profile, extra: true })
+      .send({
+        title: 'Ocean',
+        description: 'A deep journey',
+        profile,
+        extra: true,
+      })
       .expect(400);
     await request(app.getHttpServer())
       .post('/api/projects')
-      .send({ title: '  Hidden Ocean  ', description: '  A gentle journey into ocean life.  ', profile })
+      .send({
+        title: '  Hidden Ocean  ',
+        description: '  A gentle journey into ocean life.  ',
+        profile,
+      })
       .expect(201);
 
     expect(scripts.enqueueProject).toHaveBeenCalledWith('002-hidden-ocean');
@@ -251,7 +264,10 @@ describe('Projects REST API', () => {
 
     expect(response.body).toEqual([
       expect.objectContaining({ projectId: newer.projectId, title: 'Ocean' }),
-      expect.objectContaining({ projectId: state.projectId, title: state.topic }),
+      expect.objectContaining({
+        projectId: state.projectId,
+        title: state.topic,
+      }),
     ]);
     const summaries: unknown = response.body;
 

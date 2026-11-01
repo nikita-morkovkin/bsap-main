@@ -1,16 +1,16 @@
-import { apiClient } from "@/api/apiClient";
-import Button from "@/components/ui/Button";
-import type { StockClip } from "@/types/video.types";
-import ClipEffects from "./ClipEffects";
-import { videoText } from "./consts/video-text.const";
+import { apiClient } from '@/api/apiClient'
+import Button from '@/components/ui/Button'
+import type { StockClip } from '@/types/video.types'
+import ClipEffects from './ClipEffects'
+import { videoText } from './consts/video-text.const'
 
 type ClipCardProps = {
-  projectId: string;
-  clip: StockClip;
-  busy: boolean;
-  onToggle: (clip: StockClip) => void;
-  onDelete: (clip: StockClip) => void;
-};
+  projectId: string
+  clip: StockClip
+  busy: boolean
+  onToggle: (clip: StockClip) => void
+  onDelete: (clip: StockClip) => void
+}
 
 const ClipCard = ({
   projectId,
@@ -19,23 +19,23 @@ const ClipCard = ({
   onToggle,
   onDelete,
 }: ClipCardProps) => {
-  const thumbnail = apiClient.video.url(projectId, `clips/${clip.id}/thumb`);
+  const thumbnail = apiClient.video.url(projectId, `clips/${clip.id}/thumb`)
 
   const toggle = () => {
-    onToggle(clip);
-  };
+    onToggle(clip)
+  }
 
   const remove = () => {
-    onDelete(clip);
-  };
+    onDelete(clip)
+  }
 
-  const stretched = (clip.plannedDurationSec ?? 0) > clip.durationSec + 0.1;
+  const stretched = (clip.plannedDurationSec ?? 0) > clip.durationSec + 0.1
   const status =
-    clip.status === "ready"
+    clip.status === 'ready'
       ? videoText.ready
-      : clip.status === "invalid"
+      : clip.status === 'invalid'
         ? videoText.invalid
-        : videoText.processing;
+        : videoText.processing
 
   return (
     <article className="space-y-2 rounded-xl border p-3">
@@ -49,7 +49,7 @@ const ClipCard = ({
         {clip.originalName}
       </p>
       <p className="text-xs text-muted-foreground">
-        {clip.durationSec.toFixed(1)}s · {clip.fps.toFixed(2)} fps ·{" "}
+        {clip.durationSec.toFixed(1)}s · {clip.fps.toFixed(2)} fps ·{' '}
         {clip.width}×{clip.height}
       </p>
       <p className="text-xs">
@@ -74,7 +74,7 @@ const ClipCard = ({
       </Button>
       <ClipEffects projectId={projectId} clipId={clip.id} busy={busy} />
     </article>
-  );
-};
+  )
+}
 
-export default ClipCard;
+export default ClipCard

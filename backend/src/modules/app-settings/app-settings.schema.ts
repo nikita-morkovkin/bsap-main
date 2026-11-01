@@ -6,21 +6,23 @@ export const lumeanServiceSchema = z.enum(['elevenlabs', 'cartesia']);
 /** Stored in <projects>/_app-settings.json. Holds the API key, so never return it as-is. */
 export const appSettingsSchema = z.strictObject({
   ttsProvider: ttsProviderSchema.default('kokoro'),
-  kokoroDevice: z.enum(['cpu', 'gpu']).default('cpu'),
+  kokoroDevice: z.enum(['cpu', 'gpu']).default('gpu'),
   lumeanService: lumeanServiceSchema.default('elevenlabs'),
   lumeanApiKey: z.string().trim().min(1).max(500).optional(),
+  polzaApiKey: z.string().trim().min(1).max(500).optional(),
 });
 
 export type AppSettings = z.infer<typeof appSettingsSchema>;
 export type TtsProvider = z.infer<typeof ttsProviderSchema>;
 export type LumeanService = z.infer<typeof lumeanServiceSchema>;
 
-/** Accepts `lumeanApiKey: null` to clear the key. */
+/** Accepts either provider key as null to clear the saved credential. */
 export const appSettingsPatchSchema = z.strictObject({
   ttsProvider: ttsProviderSchema.optional(),
   kokoroDevice: z.enum(['cpu', 'gpu']).optional(),
   lumeanService: lumeanServiceSchema.optional(),
   lumeanApiKey: z.string().trim().min(1).max(500).nullable().optional(),
+  polzaApiKey: z.string().trim().min(1).max(500).nullable().optional(),
 });
 
 export type AppSettingsPatch = z.infer<typeof appSettingsPatchSchema>;
@@ -32,4 +34,7 @@ export type PublicAppSettings = {
   lumeanService: LumeanService;
   lumeanApiKeySet: boolean;
   lumeanApiKeyHint: string | null;
+  polzaApiKeySet: boolean;
+  polzaApiKeyHint: string | null;
+  polzaApiKeyAvailable: boolean;
 };

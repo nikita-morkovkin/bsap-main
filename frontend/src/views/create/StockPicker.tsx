@@ -1,17 +1,17 @@
-import Button from "@/components/ui/Button";
-import ClipDropzone from "@/views/video/ClipDropzone";
-import { videoText } from "@/views/video/consts/video-text.const";
+import Button from '@/components/ui/Button'
+import ClipDropzone from '@/views/video/ClipDropzone'
+import { videoText } from '@/views/video/consts/video-text.const'
 
-type StockPickerProps = { files: File[]; onChange: (files: File[]) => void };
+type StockPickerProps = { files: File[]; onChange: (files: File[]) => void }
 
-const VIDEO_FILE = /\.(mp4|mov|mkv|webm|m4v)$/i;
+const VIDEO_FILE = /\.(mp4|mov|mkv|webm|m4v)$/i
 
 const StockPicker = ({ files, onChange }: StockPickerProps) => {
   const handleFiles = (added: File[]) => {
-    onChange([...files, ...added.filter((file) => VIDEO_FILE.test(file.name))]);
-  };
-  const clear = () => onChange([]);
-  const gib = files.reduce((sum, file) => sum + file.size, 0) / 1073741824;
+    onChange([...files, ...added.filter((file) => VIDEO_FILE.test(file.name))])
+  }
+  const clear = () => onChange([])
+  const gib = files.reduce((sum, file) => sum + file.size, 0) / 1073741824
 
   return (
     <section className="space-y-3">
@@ -29,7 +29,7 @@ const StockPicker = ({ files, onChange }: StockPickerProps) => {
         </div>
       )}
     </section>
-  );
-};
+  )
+}
 
-export default StockPicker;
+export default StockPicker

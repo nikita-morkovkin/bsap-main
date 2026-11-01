@@ -1,14 +1,14 @@
-import babel from "@rolldown/plugin-babel";
-import tailwindcss from "@tailwindcss/vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
+import babel from '@rolldown/plugin-babel'
+import tailwindcss from '@tailwindcss/vite'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   preview: {
     proxy: {
-      "/api": {
-        target: process.env.API_PROXY_TARGET || "http://localhost:3000",
+      '/api': {
+        target: process.env.API_PROXY_TARGET || 'http://localhost:3000',
         changeOrigin: true,
       },
     },
@@ -18,7 +18,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   plugins: [
@@ -26,4 +26,4 @@ export default defineConfig({
     tailwindcss(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
-});
+})

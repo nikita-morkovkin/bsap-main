@@ -1,38 +1,38 @@
-import { Button } from "@/components/ui/Button";
-import { Textarea } from "@/components/ui/Textarea";
-import { useTimestamps } from "@/hooks/queries/useTimestamps.hook";
-import { toast } from "sonner";
+import { Button } from '@/components/ui/Button'
+import { Textarea } from '@/components/ui/Textarea'
+import { useTimestamps } from '@/hooks/queries/useTimestamps.hook'
+import { toast } from 'sonner'
 
 type TimestampsBoxProps = {
-  projectId: string;
-  revision: string;
-  available: boolean;
-};
+  projectId: string
+  revision: string
+  available: boolean
+}
 
 const TimestampsBox = ({
   projectId,
   revision,
   available,
 }: TimestampsBoxProps) => {
-  const query = useTimestamps({ id: projectId, revision, enabled: available });
+  const query = useTimestamps({ id: projectId, revision, enabled: available })
 
-  const text = query.data ?? "";
-  const disabled = !text;
+  const text = query.data ?? ''
+  const disabled = !text
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-      toast.success("YouTube timestamps copied");
+      await navigator.clipboard.writeText(text)
+      toast.success('YouTube timestamps copied')
     } catch {
       toast.error(
-        "Clipboard unavailable. Select and copy the timestamps manually.",
-      );
+        'Clipboard unavailable. Select and copy the timestamps manually.',
+      )
     }
-  };
+  }
 
   const handleRetry = () => {
-    query.refetch();
-  };
+    query.refetch()
+  }
 
   return (
     <div className="space-y-3">
@@ -56,7 +56,7 @@ const TimestampsBox = ({
         </Button>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TimestampsBox;
+export default TimestampsBox

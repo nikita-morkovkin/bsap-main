@@ -21,11 +21,9 @@ services:
     networks:
       - bsap-network
 
-  # GPU Kokoro is optional: start with `docker compose --profile gpu up -d kokoro-tts-gpu`.
-  # Requires an NVIDIA GPU and the NVIDIA Container Toolkit on the host.
+  # GPU Kokoro is the default device. Requires an NVIDIA GPU and NVIDIA Container Toolkit.
   kokoro-tts-gpu:
     image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
-    profiles: ["gpu"]
     deploy:
       resources:
         reservations:
@@ -57,7 +55,7 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      kokoro-tts:
+      kokoro-tts-gpu:
         condition: service_started
       polza-api:
         condition: service_started

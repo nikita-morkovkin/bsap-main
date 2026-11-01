@@ -1,78 +1,78 @@
-import MusicSelector from "@/components/music/MusicSelector";
-import Input from "@/components/ui/Input";
-import { useProjectMusicMutation } from "@/hooks/mutations/useProjectMusicMutation.hook";
-import { useMusic } from "@/hooks/queries/useMusic.hook";
-import type { MusicTrack } from "@/types/music.types";
-import type { ProjectState } from "@/types/project.types";
-import { useState, type ChangeEvent } from "react";
+import MusicSelector from '@/components/music/MusicSelector'
+import Input from '@/components/ui/Input'
+import { useProjectMusicMutation } from '@/hooks/mutations/useProjectMusicMutation.hook'
+import { useMusic } from '@/hooks/queries/useMusic.hook'
+import type { MusicTrack } from '@/types/music.types'
+import type { ProjectState } from '@/types/project.types'
+import { useState, type ChangeEvent } from 'react'
 
-type ProjectMusicPanelProps = { state: ProjectState; productionBusy?: boolean };
-type Draft = { ids: string[]; revision: number; ambientVolumeDb: number };
+type ProjectMusicPanelProps = { state: ProjectState; productionBusy?: boolean }
+type Draft = { ids: string[]; revision: number; ambientVolumeDb: number }
 
 const ProjectMusicPanel = ({
   state,
   productionBusy,
 }: ProjectMusicPanelProps) => {
-  const library = useMusic();
-  const mutation = useProjectMusicMutation({ projectId: state.projectId });
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const saved = state.music;
-  const selected = draft?.ids ?? saved?.selectedTrackIds ?? [];
-  const savedVolume = state.profile.masteringConfig.ambientVolumeDb ?? -32;
-  const volume = draft?.ambientVolumeDb ?? savedVolume;
+  const library = useMusic()
+  const mutation = useProjectMusicMutation({ projectId: state.projectId })
+  const [draft, setDraft] = useState<Draft | null>(null)
+  const saved = state.music
+  const selected = draft?.ids ?? saved?.selectedTrackIds ?? []
+  const savedVolume = state.profile.masteringConfig.ambientVolumeDb ?? -32
+  const volume = draft?.ambientVolumeDb ?? savedVolume
   const dirty =
     draft !== null &&
     (!saved ||
       JSON.stringify(selected) !== JSON.stringify(saved.selectedTrackIds) ||
-      volume !== savedVolume);
+      volume !== savedVolume)
   const active =
     productionBusy ||
-    !["IDLE", "COMPLETED", "FAILED", "CANCELLED"].includes(state.status);
-  const disabled = active || mutation.isPending;
-  const saveDisabled = disabled || !dirty;
-  const chapters = Object.values(state.chapters);
+    !['IDLE', 'COMPLETED', 'FAILED', 'CANCELLED'].includes(state.status)
+  const disabled = active || mutation.isPending
+  const saveDisabled = disabled || !dirty
+  const chapters = Object.values(state.chapters)
   const remasterDisabled =
     disabled ||
     dirty ||
     !chapters.length ||
-    chapters.some((chapter) => chapter.ttsStatus !== "COMPLETED");
+    chapters.some((chapter) => chapter.ttsStatus !== 'COMPLETED')
   const snapshots: MusicTrack[] = (saved?.snapshots ?? []).map((snapshot) => ({
     ...snapshot,
     available: true,
-  }));
+  }))
   const tracks = [
     ...snapshots,
     ...(library.data?.tracks ?? []).filter(
       (track) => !snapshots.some((item) => item.id === track.id),
     ),
-  ];
+  ]
   const handleSelection = (ids: string[]) =>
     setDraft({
       ids,
       revision: draft?.revision ?? saved?.revision ?? 0,
       ambientVolumeDb: volume,
-    });
+    })
   const handleVolume = (event: ChangeEvent<HTMLInputElement>) =>
     setDraft({
       ids: selected,
       revision: draft?.revision ?? saved?.revision ?? 0,
       ambientVolumeDb: Number(event.currentTarget.value),
-    });
+    })
   const handleSave = () =>
     mutation.mutate(
       {
-        kind: "save",
+        kind: 'save',
         revision: draft?.revision ?? saved?.revision ?? 0,
         selectedTrackIds: selected,
         ambientVolumeDb: volume,
       },
       { onSuccess: () => setDraft(null) },
-    );
-  const handleDiscard = () => setDraft(null);
-  const handleRemaster = () => mutation.mutate({ kind: "remaster" });
+    )
+  const handleDiscard = () => setDraft(null)
+  const handleRemaster = () => mutation.mutate({ kind: 'remaster' })
   const handleRetry = () => {
-    library.refetch();
-  };
+    library.refetch()
+  }
 
   return (
     <section className="space-y-4 rounded-xl border p-4">
@@ -93,21 +93,21 @@ const ProjectMusicPanel = ({
       {saved?.snapshots.map((snapshot) => {
         const current = library.data?.tracks.find(
           (track) => track.id === snapshot.id,
-        );
+        )
         const status = !library.data
-          ? "Library status loading"
+          ? 'Library status loading'
           : !current
-            ? "Library entry removed; project copy retained"
+            ? 'Library entry removed; project copy retained'
             : current.version !== snapshot.version
-              ? "New library version available; saved copy retained"
-              : "Saved library version";
+              ? 'New library version available; saved copy retained'
+              : 'Saved library version'
 
         return (
           <p key={snapshot.id} className="text-sm">
-            {snapshot.displayName} · version {snapshot.version.slice(0, 8)} ·{" "}
+            {snapshot.displayName} · version {snapshot.version.slice(0, 8)} ·{' '}
             {status}
           </p>
-        );
+        )
       })}
       <p className="text-sm">
         To adopt a newer library version, explicitly remove the track and Save,
@@ -116,7 +116,7 @@ const ProjectMusicPanel = ({
       </p>
       {library.isError && (
         <p role="alert">
-          Library could not load. Saved copies remain selected.{" "}
+          Library could not load. Saved copies remain selected.{' '}
           <button onClick={handleRetry}>Retry</button>
         </p>
       )}
@@ -199,7 +199,7 @@ const ProjectMusicPanel = ({
         </p>
       )}
     </section>
-  );
-};
+  )
+}
 
-export default ProjectMusicPanel;
+export default ProjectMusicPanel

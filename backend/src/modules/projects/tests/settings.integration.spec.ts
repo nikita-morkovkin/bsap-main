@@ -20,7 +20,8 @@ import { KokoroTtsAdapter } from '../../tts/kokoro-tts.adapter';
         KOKORO_TIMEOUT_MS: 60000,
       });
       const catalog = new CatalogService(config, {
-        get: async () => ({ kokoroDevice: 'cpu' as const }),
+        get: () => Promise.resolve({ kokoroDevice: 'cpu' as const }),
+        getEffectivePolzaApiKey: () => Promise.resolve('public-catalog'),
       } as never);
       const [models, voices] = await Promise.all([
         catalog.getModels(),
@@ -47,7 +48,7 @@ import { KokoroTtsAdapter } from '../../tts/kokoro-tts.adapter';
         });
         const output = join(directory, 'voice.wav');
         await new KokoroTtsAdapter(config, {
-          get: async () => ({ kokoroDevice: 'cpu' as const }),
+          get: () => Promise.resolve({ kokoroDevice: 'cpu' as const }),
         } as never).synthesize(
           'Soft starlight rests upon the quiet ocean.',
           output,

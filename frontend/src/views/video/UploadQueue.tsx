@@ -1,21 +1,21 @@
-import Button from "@/components/ui/Button";
-import type { VideoUploadItem } from "@/types/video.types";
-import type { MouseEvent } from "react";
-import { videoText } from "./consts/video-text.const";
+import Button from '@/components/ui/Button'
+import type { VideoUploadItem } from '@/types/video.types'
+import type { MouseEvent } from 'react'
+import { videoText } from './consts/video-text.const'
 
 type UploadQueueProps = {
-  items: VideoUploadItem[];
-  onRetry: (id: string) => void;
-};
+  items: VideoUploadItem[]
+  onRetry: (id: string) => void
+}
 
 const UploadQueue = ({ items, onRetry }: UploadQueueProps) => {
   const handleRetry = (event: MouseEvent<HTMLButtonElement>) => {
-    const id = event.currentTarget.dataset.id;
+    const id = event.currentTarget.dataset.id
 
     if (id) {
-      onRetry(id);
+      onRetry(id)
     }
-  };
+  }
 
   return (
     <div className="max-h-48 space-y-2 overflow-auto" aria-live="polite">
@@ -24,8 +24,9 @@ const UploadQueue = ({ items, onRetry }: UploadQueueProps) => {
           <span className="min-w-0 flex-1 truncate">{item.file.name}</span>
           <progress max={1} value={item.progress} aria-label={item.file.name} />
           <span>{videoText[item.status]}</span>
+
           {item.error && <span className="text-destructive">{item.error}</span>}
-          {item.status === "failed" && (
+          {item.status === 'failed' && (
             <Button data-id={item.id} onClick={handleRetry}>
               {videoText.retry}
             </Button>
@@ -33,7 +34,7 @@ const UploadQueue = ({ items, onRetry }: UploadQueueProps) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default UploadQueue;
+export default UploadQueue

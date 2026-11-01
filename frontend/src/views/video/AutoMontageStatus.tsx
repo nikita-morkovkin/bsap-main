@@ -1,16 +1,16 @@
-import { apiClient } from "@/api/apiClient";
-import Button from "@/components/ui/Button";
-import { useStockUploadStore } from "@/store/stockUpload.store";
-import type { AutoMontage } from "@/types/video.types";
-import { useState } from "react";
-import { toast } from "sonner";
-import { videoText } from "./consts/video-text.const";
+import { apiClient } from '@/api/apiClient'
+import Button from '@/components/ui/Button'
+import { useStockUploadStore } from '@/store/stockUpload.store'
+import type { AutoMontage } from '@/types/video.types'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { videoText } from './consts/video-text.const'
 
 type AutoMontageStatusProps = {
-  projectId: string;
-  autoMontage?: AutoMontage;
-  refresh: () => Promise<unknown>;
-};
+  projectId: string
+  autoMontage?: AutoMontage
+  refresh: () => Promise<unknown>
+}
 
 const labels = {
   uploading: videoText.autoUploading,
@@ -18,31 +18,37 @@ const labels = {
   rendering: videoText.autoRendering,
   done: videoText.autoDone,
   failed: videoText.autoFailed,
-} as const;
+} as const
 
-const AutoMontageStatus = ({ projectId, autoMontage, refresh }: AutoMontageStatusProps) => {
-  const items = useStockUploadStore((state) => state.uploads[projectId]);
-  const [pending, setPending] = useState(false);
+const AutoMontageStatus = ({
+  projectId,
+  autoMontage,
+  refresh,
+}: AutoMontageStatusProps) => {
+  const items = useStockUploadStore((state) => state.uploads[projectId])
+  const [pending, setPending] = useState(false)
 
   if (!autoMontage) {
-    return null;
+    return null
   }
 
-  const total = items?.length ?? 0;
-  const finished = items?.filter((item) => item.status === "done" || item.status === "failed").length ?? 0;
-  const failed = items?.filter((item) => item.status === "failed").length ?? 0;
-  const uploading = autoMontage.status === "uploading";
+  const total = items?.length ?? 0
+  const finished =
+    items?.filter((item) => item.status === 'done' || item.status === 'failed')
+      .length ?? 0
+  const failed = items?.filter((item) => item.status === 'failed').length ?? 0
+  const uploading = autoMontage.status === 'uploading'
   // No live upload in this tab (page reloaded) or the upload ended without notifying the backend.
-  const stuck = uploading && (total === 0 || finished === total);
+  const stuck = uploading && (total === 0 || finished === total)
 
   const resume = () => {
-    setPending(true);
+    setPending(true)
     apiClient.video
       .autoMontageUploaded(projectId, total - failed)
       .then(refresh)
       .catch(() => toast.error(videoText.error))
-      .finally(() => setPending(false));
-  };
+      .finally(() => setPending(false))
+  }
 
   return (
     <section className="space-y-2 rounded-xl border p-4" aria-live="polite">
@@ -50,7 +56,12 @@ const AutoMontageStatus = ({ projectId, autoMontage, refresh }: AutoMontageStatu
       <p>{labels[autoMontage.status]}</p>
       {uploading && total > 0 && (
         <>
-          <progress className="w-full" max={total} value={finished} aria-label={videoText.autoUploading} />
+          <progress
+            className="w-full"
+            max={total}
+            value={finished}
+            aria-label={videoText.autoUploading}
+          />
           <p className="text-sm">
             {finished} / {total}
             {failed > 0 && ` · ${failed} ${videoText.failed.toLowerCase()}`}
@@ -65,9 +76,11 @@ const AutoMontageStatus = ({ projectId, autoMontage, refresh }: AutoMontageStatu
           </Button>
         </div>
       )}
-      {autoMontage.error && <p className="text-sm text-destructive">{autoMontage.error}</p>}
+      {autoMontage.error && (
+        <p className="text-sm text-destructive">{autoMontage.error}</p>
+      )}
     </section>
-  );
-};
+  )
+}
 
-export default AutoMontageStatus;
+export default AutoMontageStatus

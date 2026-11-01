@@ -1,27 +1,27 @@
-import { apiClient } from "@/api/apiClient";
-import Button from "@/components/ui/Button";
+import { apiClient } from '@/api/apiClient'
+import Button from '@/components/ui/Button'
 import type {
   VideoJob,
   VideoStatus,
   VideoStyleConfig,
-} from "@/types/video.types";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useClock } from "@/hooks/useClock.hook";
+} from '@/types/video.types'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useClock } from '@/hooks/useClock.hook'
 import {
   approximateJobEta,
   formatApproximateJobEta,
-} from "@/utils/approximate-job-eta";
-import { videoText } from "./consts/video-text.const";
-import OutputPlayer from "./OutputPlayer";
+} from '@/utils/approximate-job-eta'
+import { videoText } from './consts/video-text.const'
+import OutputPlayer from './OutputPlayer'
 
 type BuildPanelProps = {
-  projectId: string;
-  style: VideoStyleConfig;
-  status?: VideoStatus;
-  refresh: () => Promise<unknown>;
-  busy: boolean;
-};
+  projectId: string
+  style: VideoStyleConfig
+  status?: VideoStatus
+  refresh: () => Promise<unknown>
+  busy: boolean
+}
 
 const BuildPanel = ({
   projectId,
@@ -30,78 +30,76 @@ const BuildPanel = ({
   refresh,
   busy,
 }: BuildPanelProps) => {
-  const [pending, setPending] = useState(false);
-  const now = useClock();
-  const job = status?.job;
-  const disabled = busy || pending;
-  const buildLabel = status?.audio ? videoText.build : videoText.cycle;
+  const [pending, setPending] = useState(false)
+  const now = useClock()
+  const job = status?.job
+  const disabled = busy || pending
+  const buildLabel = status?.audio ? videoText.build : videoText.cycle
   const elapsed = job
-    ? Math.round(
-        (now - new Date(job.startedAt).getTime()) / 1000,
-      )
-    : 0;
+    ? Math.round((now - new Date(job.startedAt).getTime()) / 1000)
+    : 0
   const eta = job
     ? approximateJobEta(job.startedAt, job.progress, now)
-    : undefined;
+    : undefined
 
   const stages = [
-    "normalizing",
-    "planning",
-    "rendering_chunks",
-    "stitching",
-    "muxing",
-  ] as const;
+    'normalizing',
+    'planning',
+    'rendering_chunks',
+    'stitching',
+    'muxing',
+  ] as const
 
   const estimate = (
     (style.cycleTargetMinutes * 60 * 3000000) /
     1073741824
-  ).toFixed(1);
+  ).toFixed(1)
 
-  const run = async (kind: VideoJob["kind"]) => {
-    setPending(true);
+  const run = async (kind: VideoJob['kind']) => {
+    setPending(true)
 
     try {
-      await apiClient.video.start(projectId, kind, style);
-      await refresh();
+      await apiClient.video.start(projectId, kind, style)
+      await refresh()
     } catch {
-      toast.error(videoText.error);
+      toast.error(videoText.error)
     } finally {
-      setPending(false);
+      setPending(false)
     }
-  };
+  }
 
   const build = () => {
-    run("build");
-  };
+    run('build')
+  }
 
   const preview = () => {
-    run("preview");
-  };
+    run('preview')
+  }
 
   const mux = () => {
-    run("mux");
-  };
+    run('mux')
+  }
 
   const cancel = () => {
     if (job) {
       apiClient.video
         .cancel(projectId, job.jobId)
         .then(refresh)
-        .catch(() => toast.error(videoText.error));
+        .catch(() => toast.error(videoText.error))
     }
-  };
+  }
 
   const clear = () => {
     apiClient.video
       .clear(projectId)
       .then(refresh)
-      .catch(() => toast.error(videoText.error));
-  };
+      .catch(() => toast.error(videoText.error))
+  }
 
   return (
     <section className="space-y-4">
       <p>
-        {status?.audio ? videoText.audioReady : videoText.audioMissing}{" "}
+        {status?.audio ? videoText.audioReady : videoText.audioMissing}{' '}
         {status?.audio?.duration.toFixed(1)}s
       </p>
       <p className="text-sm text-muted-foreground">{videoText.loop}</p>
@@ -132,7 +130,7 @@ const BuildPanel = ({
       {job && (
         <div className="space-y-2" aria-live="polite">
           <p>
-            {videoText[job.stage]} · {Math.round(job.progress * 100)}% ·{" "}
+            {videoText[job.stage]} · {Math.round(job.progress * 100)}% ·{' '}
             {videoText.elapsed}: {elapsed}
             {eta !== undefined && (
               <> · {formatApproximateJobEta(eta)} (estimate)</>
@@ -158,7 +156,7 @@ const BuildPanel = ({
               </pre>
             </details>
           )}
-          {job.stage === "failed" && (
+          {job.stage === 'failed' && (
             <Button disabled={disabled} onClick={build}>
               {videoText.retry}
             </Button>
@@ -187,7 +185,7 @@ const BuildPanel = ({
         />
       )}
     </section>
-  );
-};
+  )
+}
 
-export default BuildPanel;
+export default BuildPanel

@@ -1,18 +1,18 @@
-import Badge from "@/components/ui/Badge";
-import type { Chapter, Profile } from "@/types/project.types";
-import { formatTimestamp } from "@/utils/project.util";
-import { Accordion } from "@base-ui/react/accordion";
-import { ChevronDown } from "lucide-react";
-import ChunkRow from "./ChunkRow";
+import Badge from '@/components/ui/Badge'
+import type { Chapter, Profile } from '@/types/project.types'
+import { formatTimestamp } from '@/utils/project.util'
+import { Accordion } from '@base-ui/react/accordion'
+import { ChevronDown } from 'lucide-react'
+import ChunkRow from './ChunkRow'
 
 type ChapterItemProps = {
-  projectId: string;
-  chapter: Chapter;
-  profile: Profile;
-  startMs: number;
-  revision: string;
-  canRegenerate: boolean;
-};
+  projectId: string
+  chapter: Chapter
+  profile: Profile
+  startMs: number
+  revision: string
+  canRegenerate: boolean
+}
 
 const ChapterItem = ({
   projectId,
@@ -22,12 +22,12 @@ const ChapterItem = ({
   revision,
   canRegenerate,
 }: ChapterItemProps) => {
-  const value = String(chapter.chapterNumber);
-  const duration = formatTimestamp(chapter.durationMs);
-  const start = formatTimestamp(startMs);
+  const value = String(chapter.chapterNumber)
+  const duration = formatTimestamp(chapter.durationMs)
+  const start = formatTimestamp(startMs)
   const chunks = [...chapter.chunks].sort(
     (left, right) => left.index - right.index,
-  );
+  )
 
   return (
     <Accordion.Item
@@ -70,7 +70,7 @@ const ChapterItem = ({
         </ul>
       </Accordion.Panel>
     </Accordion.Item>
-  );
-};
+  )
+}
 
-export default ChapterItem;
+export default ChapterItem

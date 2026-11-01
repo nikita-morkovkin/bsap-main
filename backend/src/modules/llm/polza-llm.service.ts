@@ -2,25 +2,21 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { generateText, streamText } from 'ai';
+import { AppSettingsService } from '../app-settings/app-settings.service';
 import type { LlmRequest } from './types/llm-request.type';
 
 @Injectable()
 export class PolzaLlmService {
   private readonly llmBaseUrl: string;
-  private readonly apiKey: string;
-
-  constructor(private readonly configService: ConfigService) {
-    this.apiKey = this.configService.getOrThrow<string>('POLZA_API_KEY');
-
-    if (!this.apiKey.trim()) {
-      throw new Error('POLZA_API_KEY must not be empty');
-    }
-
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly appSettings: AppSettingsService,
+  ) {
     this.llmBaseUrl = this.configService.getOrThrow<string>('POLZA_API_URL');
   }
 
   public async generateText(request: LlmRequest): Promise<string> {
-    const options = this.getOptions(request);
+    const options = await this.getOptions(request);
     const result = await generateText(options);
 
     this.validateCompletion(result.text, result.finishReason);
@@ -29,7 +25,7 @@ export class PolzaLlmService {
   }
 
   public async streamText(request: LlmRequest): Promise<string> {
-    const options = this.getOptions(request);
+    const options = await this.getOptions(request);
     const result = streamText(options);
     let text = '';
 
@@ -54,10 +50,20 @@ export class PolzaLlmService {
     return text;
   }
 
-  private getOptions(request: LlmRequest) {
+  private async getOptions(request: LlmRequest) {
+    const apiKey = await this.appSettings.getEffectivePolzaApiKey(
+      this.configService.get<string>('POLZA_API_KEY'),
+    );
+
+    if (!apiKey) {
+      throw new Error(
+        'Polza.AI API key is not configured. Add one in Settings or configure POLZA_API_KEY.',
+      );
+    }
+
     const provider = createOpenAI({
       baseURL: this.llmBaseUrl,
-      apiKey: this.apiKey,
+      apiKey,
     });
 
     return {

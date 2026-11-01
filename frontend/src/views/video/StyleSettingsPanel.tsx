@@ -1,24 +1,24 @@
-import Button from "@/components/ui/Button";
-import type { VideoStyleConfig } from "@/types/video.types";
-import type { ChangeEvent } from "react";
-import { videoControls } from "./consts/video-controls.const";
-import { videoText } from "./consts/video-text.const";
-import StyleNumber from "./StyleNumber";
+import Button from '@/components/ui/Button'
+import type { VideoStyleConfig } from '@/types/video.types'
+import type { ChangeEvent } from 'react'
+import { videoControls } from './consts/video-controls.const'
+import { videoText } from './consts/video-text.const'
+import StyleNumber from './StyleNumber'
 
 type StyleSettingsPanelProps = {
-  style: VideoStyleConfig;
-  onChange: (style: VideoStyleConfig) => void;
-};
+  style: VideoStyleConfig
+  onChange: (style: VideoStyleConfig) => void
+}
 
 const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
   const preset = (event: ChangeEvent<HTMLSelectElement>) => {
     const values =
-      event.target.value === "natural"
+      event.target.value === 'natural'
         ? [0, 1, 1, 1]
-        : event.target.value === "soft"
+        : event.target.value === 'soft'
           ? [-0.12, 0.95, 0.85, 0.95]
-          : [-0.22, 0.88, 0.75, 0.85];
-    const [brightness, contrast, saturation, gamma] = values;
+          : [-0.22, 0.88, 0.75, 0.85]
+    const [brightness, contrast, saturation, gamma] = values
 
     onChange({
       ...style,
@@ -27,8 +27,8 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
       saturation,
       gamma,
       vignetteEnabled: true,
-    });
-  };
+    })
+  }
 
   const reset = () => {
     onChange({
@@ -41,44 +41,44 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
       crossfadeSec: 3,
       slowMoDefault: 1.25,
       slowMoMax: 2,
-    });
-  };
+    })
+  }
 
   const vignette = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...style, vignetteEnabled: event.target.checked });
-  };
+    onChange({ ...style, vignetteEnabled: event.target.checked })
+  }
 
   const mirror = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...style, mirrorOnRepeat: event.target.checked });
-  };
+    onChange({ ...style, mirrorOnRepeat: event.target.checked })
+  }
 
   const antiBanding = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...style, antiBanding: event.target.checked });
-  };
+    onChange({ ...style, antiBanding: event.target.checked })
+  }
 
   const transition = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+    const value = event.target.value
 
-    if (value === "fade" || value === "smoothleft" || value === "dissolve") {
-      onChange({ ...style, transition: value });
+    if (value === 'fade' || value === 'smoothleft' || value === 'dissolve') {
+      onChange({ ...style, transition: value })
     }
-  };
+  }
 
   const angle = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
+    const value = event.target.value
 
     if (
-      value === "PI/3" ||
-      value === "PI/4" ||
-      value === "PI/5" ||
-      value === "PI/6"
+      value === 'PI/3' ||
+      value === 'PI/4' ||
+      value === 'PI/5' ||
+      value === 'PI/6'
     ) {
-      onChange({ ...style, vignetteAngle: value });
+      onChange({ ...style, vignetteAngle: value })
     }
-  };
+  }
   const reshuffle = () => {
-    onChange({ ...style, seed: crypto.getRandomValues(new Uint32Array(1))[0] });
-  };
+    onChange({ ...style, seed: crypto.getRandomValues(new Uint32Array(1))[0] })
+  }
 
   return (
     <section className="space-y-4">
@@ -110,7 +110,7 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
             type="checkbox"
             checked={style.antiBanding}
             onChange={antiBanding}
-          />{" "}
+          />{' '}
           Anti-banding
         </label>
         <label>
@@ -118,11 +118,11 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
             type="checkbox"
             checked={style.vignetteEnabled}
             onChange={vignette}
-          />{" "}
+          />{' '}
           {videoText.vignette}
         </label>
         <label>
-          {videoText.angle}{" "}
+          {videoText.angle}{' '}
           <select value={style.vignetteAngle} onChange={angle}>
             <option>PI/3</option>
             <option>PI/4</option>
@@ -135,11 +135,11 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
             type="checkbox"
             checked={style.mirrorOnRepeat}
             onChange={mirror}
-          />{" "}
+          />{' '}
           {videoText.mirror}
         </label>
         <label>
-          {videoText.transition}{" "}
+          {videoText.transition}{' '}
           <select value={style.transition} onChange={transition}>
             <option>fade</option>
             <option>smoothleft</option>
@@ -154,7 +154,7 @@ const StyleSettingsPanel = ({ style, onChange }: StyleSettingsPanelProps) => {
         {videoText.reset}
       </Button>
     </section>
-  );
-};
+  )
+}
 
-export default StyleSettingsPanel;
+export default StyleSettingsPanel

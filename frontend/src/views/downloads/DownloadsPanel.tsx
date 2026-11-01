@@ -1,13 +1,13 @@
-import QueryFeedback from "@/components/common/QueryFeedback";
-import { useDownloadsPanel } from "./hooks/useDownloadsPanel.hook";
-import ChapterDownload from "./ChapterDownload";
-import DownloadLink from "./DownloadLink";
-import TimestampsBox from "./TimestampsBox";
+import QueryFeedback from '@/components/common/QueryFeedback'
+import ChapterDownload from './ChapterDownload'
+import DownloadLink from './DownloadLink'
+import { useDownloadsPanel } from './hooks/useDownloadsPanel.hook'
+import TimestampsBox from './TimestampsBox'
 
-type DownloadsPanelProps = { projectId: string };
+type DownloadsPanelProps = { projectId: string }
 
 const DownloadsPanel = ({ projectId }: DownloadsPanelProps) => {
-  const { query, handleRetry, data } = useDownloadsPanel({ projectId });
+  const { query, handleRetry, data } = useDownloadsPanel({ projectId })
 
   if (!data) {
     return (
@@ -16,7 +16,7 @@ const DownloadsPanel = ({ projectId }: DownloadsPanelProps) => {
         message="Loading production exports…"
         onRetry={handleRetry}
       />
-    );
+    )
   }
 
   const {
@@ -35,7 +35,7 @@ const DownloadsPanel = ({ projectId }: DownloadsPanelProps) => {
     hasTimestamps,
     hasMarkers,
     hasBackgroundMusic,
-  } = data;
+  } = data
 
   return (
     <section className="space-y-6">
@@ -121,7 +121,7 @@ const DownloadsPanel = ({ projectId }: DownloadsPanelProps) => {
         </p>
       )}
     </section>
-  );
-};
+  )
+}
 
-export default DownloadsPanel;
+export default DownloadsPanel

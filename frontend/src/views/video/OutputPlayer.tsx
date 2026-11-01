@@ -1,31 +1,31 @@
-import { apiClient } from "@/api/apiClient";
-import { videoText } from "./consts/video-text.const";
+import { apiClient } from '@/api/apiClient'
+import { videoText } from './consts/video-text.const'
 
 type OutputPlayerProps = {
-  projectId: string;
-  kind: "preview" | "cycle" | "final";
-  version: string;
-};
+  projectId: string
+  kind: 'preview' | 'cycle' | 'final'
+  version: string
+}
 
 const OutputPlayer = ({ projectId, kind, version }: OutputPlayerProps) => {
   const url = apiClient.video.url(
     projectId,
     `output?kind=${kind}&v=${encodeURIComponent(version)}`,
-  );
+  )
 
   const label =
-    kind === "preview"
+    kind === 'preview'
       ? videoText.previewOutput
-      : kind === "cycle"
+      : kind === 'cycle'
         ? videoText.cycleOutput
-        : videoText.output;
+        : videoText.output
   const downloadLabel =
-    kind === "cycle" ? "Download loop MP4" : videoText.download;
+    kind === 'cycle' ? 'Download loop MP4' : videoText.download
 
   return (
     <figure className="space-y-2">
       <figcaption className="font-medium">{label}</figcaption>
-      {kind === "cycle" && (
+      {kind === 'cycle' && (
         <p className="text-sm text-muted-foreground">
           This silent loop is the building block, repeated to narration length.
           Download the full-length silent track in Exports.
@@ -43,7 +43,7 @@ const OutputPlayer = ({ projectId, kind, version }: OutputPlayerProps) => {
         {downloadLabel}
       </a>
     </figure>
-  );
-};
+  )
+}
 
-export default OutputPlayer;
+export default OutputPlayer

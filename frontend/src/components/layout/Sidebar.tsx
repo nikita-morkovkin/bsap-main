@@ -1,16 +1,21 @@
-import { Button } from "@/components/ui/Button";
-import { useProjects } from "@/hooks/queries/useProjects.hook";
-import { useUiStore } from "@/store/ui.store";
-import { Plus } from "lucide-react";
-import ProjectListItem from "./ProjectListItem";
+import { Button } from '@/components/ui/Button'
+import { useProjects } from '@/hooks/queries/useProjects.hook'
+import { useUiStore } from '@/store/ui.store'
+import { Plus } from 'lucide-react'
+import ProjectListItem from './ProjectListItem'
 
 const Sidebar = () => {
-  const query = useProjects();
-  const handleCreate = () => useUiStore.getState().setActiveTab("create");
+  const query = useProjects()
+
+  const handleCreate = () => {
+    useUiStore.getState().setActiveTab('create')
+  }
+
   const handleRetry = () => {
-    query.refetch();
-  };
-  const projects = query.data ?? [];
+    query.refetch()
+  }
+
+  const projects = query.data ?? []
 
   return (
     <aside className="border-b bg-card p-5 lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:overflow-auto lg:border-r lg:border-b-0">
@@ -42,7 +47,7 @@ const Sidebar = () => {
         ))}
       </ul>
     </aside>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
